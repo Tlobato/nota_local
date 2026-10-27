@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { businesses } from "@/lib/db/schema";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.userId;
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase().trim();
 
     const body = await req.json();
     const { name, slug, category, googleReviewUrl, notificationPhone, coverColor } = body;
@@ -42,6 +44,7 @@ export async function POST(req: NextRequest) {
       .insert(businesses)
       .values({
         ownerId: userId || null,
+        ownerEmail: userEmail || null,
         name: name.trim(),
         slug: cleanSlug,
         category: category?.trim() || "Negócio Local",

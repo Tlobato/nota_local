@@ -2,7 +2,8 @@ import { pgTable, text, timestamp, integer, boolean, uuid } from "drizzle-orm/pg
 
 export const businesses = pgTable("businesses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  ownerId: text("owner_id"), // Clerk User ID (auth)
+  ownerId: text("owner_id"), // Clerk User ID (quando o usuário cria sozinho)
+  ownerEmail: text("owner_email"), // E-mail do proprietário (para quando VOCÊ cadastra ele previamente)
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   category: text("category").default("Estabelecimento"),
@@ -12,7 +13,8 @@ export const businesses = pgTable("businesses", {
   notificationPhone: text("notification_phone"), // WhatsApp do gerente para alerta imediato (ex: 5515999999999)
   notificationEmail: text("notification_email"),
   welcomeMessage: text("welcome_message").default("Como foi sua experiência conosco hoje?"),
-  paymentStatus: text("payment_status").default("active"), // pending, active, cancelled
+  paymentStatus: text("payment_status").default("active"), // active, pending, cancelled
+  isDemo: boolean("is_demo").default(false), // Flag para a clínica de demonstração comercial
   asaasCustomerId: text("asaas_customer_id"),
   asaasPaymentId: text("asaas_payment_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
