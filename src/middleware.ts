@@ -1,6 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/admin(.*)", "/onboarding(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/admin(.*)",
+  "/onboarding(.*)",
+  "/super-admin(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Se as chaves do Clerk estiverem configuradas, protege as rotas privadas
