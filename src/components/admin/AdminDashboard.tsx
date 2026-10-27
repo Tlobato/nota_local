@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import type { Business, Feedback } from "@/lib/db/schema";
 import QRCodeLib from "qrcode";
+import Logo from "@/components/Logo";
 
 interface AdminDashboardProps {
   initialBusiness: Business;
@@ -155,16 +156,11 @@ export default function AdminDashboard({
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800">
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="font-bold text-white tracking-tight text-lg">NotaLocal</span>
-              <span className="block text-[10px] text-blue-400 uppercase tracking-widest font-semibold">
-                Painel Gestor
-              </span>
-            </div>
+          <div>
+            <Logo variant="dark" showRatingBadge={false} />
+            <span className="block text-[10px] text-blue-400 uppercase tracking-widest font-semibold mt-1 ml-11">
+              Painel Gestor
+            </span>
           </div>
         </div>
 

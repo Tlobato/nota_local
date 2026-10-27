@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
+import Logo from "@/components/Logo";
+
 export default function LandingPage() {
   const [demoRating, setDemoRating] = useState<number | null>(null);
   const [demoStep, setDemoStep] = useState<"choose" | "positive" | "negative">("choose");
@@ -43,12 +45,7 @@ export default function LandingPage() {
       {/* Navbar */}
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <span className="font-extrabold text-white text-lg tracking-tight">NotaLocal</span>
-          </div>
+          <Logo variant="dark" showRatingBadge={true} />
 
           <div className="flex items-center gap-4">
             <Link
@@ -72,9 +69,9 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-slate-900 to-slate-900 pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>A ferramenta definitiva para comércio e clínicas locais</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-semibold shadow-sm">
+            <span className="text-amber-400 text-sm">⭐</span>
+            <span>A plataforma de reputação definitiva para o seu negócio local</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
