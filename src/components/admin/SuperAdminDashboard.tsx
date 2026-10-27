@@ -10,19 +10,17 @@ import {
   Star,
   Plus,
   Search,
-  Copy,
   Check,
   ExternalLink,
-  ShieldCheck,
   Eye,
-  RefreshCw,
   CheckCircle2,
-  Clock,
   Sparkles,
   MessageCircle,
   Mail,
   Phone,
   X,
+  Gift,
+  ShieldAlert,
 } from "lucide-react";
 
 interface BusinessItem {
@@ -47,11 +45,13 @@ interface SuperAdminDashboardProps {
     totalFeedbacks: number;
     estimatedRevenue: number;
   };
+  adminEmail?: string;
 }
 
 export default function SuperAdminDashboard({
   businesses: initialBusinesses,
   stats: initialStats,
+  adminEmail,
 }: SuperAdminDashboardProps) {
   const [businessesList, setBusinessesList] = useState<BusinessItem[]>(initialBusinesses);
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,6 +67,7 @@ export default function SuperAdminDashboard({
     name: string;
     slug: string;
     email: string;
+    isGift: boolean;
     messageText: string;
   } | null>(null);
 
@@ -133,7 +134,25 @@ export default function SuperAdminDashboard({
       const reviewUrl = `${appUrl}/${newBusiness.slug}`;
       const adminUrl = `${appUrl}/admin`;
 
-      const welcomeMessage = `Olá! Tudo bem? 
+      const isGift = form.paymentStatus === "gift";
+
+      const welcomeMessage = isGift
+        ? `Olá! Tudo bem? 🎁
+
+Você ganhou acesso exclusivo à plataforma *NotaLocal* para blindagem de avaliações no Google para a *${newBusiness.name}*! 🛡️⭐
+
+📍 *Link de Avaliação dos seus clientes:*
+${reviewUrl}
+
+🔑 *Seu Painel de Controle e QR Codes:*
+${adminUrl}
+
+*Como acessar seu painel:*
+1. Clique no link do painel acima;
+2. Faça login usando este seu e-mail: *${newBusiness.ownerEmail}* (basta clicar em "Continuar com o Google" ou solicitar o código de acesso por e-mail).
+
+Já deixei os seus QR Codes gerados e a blindagem ativada com licença cortesia 100% liberada. Qualquer dúvida estou por aqui!`
+        : `Olá! Tudo bem? 
 
 Sua plataforma *NotaLocal* para blindagem de avaliações no Google já está 100% pronta e ativa para a *${newBusiness.name}*! 🛡️⭐
 
@@ -153,6 +172,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
         name: newBusiness.name,
         slug: newBusiness.slug,
         email: newBusiness.ownerEmail || "",
+        isGift,
         messageText: welcomeMessage,
       });
 
@@ -174,7 +194,11 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
   };
 
   const handleToggleStatus = async (id: string, currentStatus: string | null) => {
-    const nextStatus = currentStatus === "active" ? "pending" : "active";
+    // Alternar ciclo: active -> gift -> pending -> active
+    let nextStatus = "active";
+    if (currentStatus === "active") nextStatus = "gift";
+    else if (currentStatus === "gift") nextStatus = "pending";
+    else nextStatus = "active";
 
     try {
       const res = await fetch("/api/super-admin/businesses", {
@@ -207,6 +231,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
     if (filterStatus === "all") return matchesSearch;
     if (filterStatus === "active") return matchesSearch && b.paymentStatus === "active";
+    if (filterStatus === "gift") return matchesSearch && b.paymentStatus === "gift";
     if (filterStatus === "pending") return matchesSearch && b.paymentStatus === "pending";
     if (filterStatus === "demo") return matchesSearch && b.isDemo;
 
@@ -225,9 +250,11 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
               <span className="text-xs font-black tracking-widest uppercase bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full shadow-sm">
                 Master Admin
               </span>
-              <span className="text-xs text-slate-400 hidden sm:inline">
-                Painel do Fundador
-              </span>
+              {adminEmail && (
+                <span className="text-xs text-slate-400 hidden sm:inline font-mono">
+                  {adminEmail}
+                </span>
+              )}
             </div>
           </div>
 
@@ -262,7 +289,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
               <Building2 className="w-5 h-5 text-blue-400" />
             </div>
             <div className="text-3xl font-extrabold text-white">{businessesList.length}</div>
-            <p className="text-xs text-slate-400 mt-1">Total de estabelecimentos cadastrados</p>
+            <p className="text-xs text-slate-400 mt-1">Total de estabelecimentos</p>
           </div>
 
           <div className="bg-slate-800/50 border border-slate-700/60 p-5 rounded-2xl relative overflow-hidden backdrop-blur">
@@ -271,9 +298,16 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
               <Users className="w-5 h-5 text-emerald-400" />
             </div>
             <div className="text-3xl font-extrabold text-emerald-400">
-              {businessesList.filter((b) => b.paymentStatus === "active" && !b.isDemo).length}
+              {
+                businessesList.filter(
+                  (b) => (b.paymentStatus === "active" || b.paymentStatus === "gift") && !b.isDemo
+                ).length
+              }
             </div>
-            <p className="text-xs text-slate-400 mt-1">Empresas com blindagem ativa</p>
+            <p className="text-xs text-slate-400 mt-1">
+              {businessesList.filter((b) => b.paymentStatus === "gift").length} cortesias /{" "}
+              {businessesList.filter((b) => b.paymentStatus === "active" && !b.isDemo).length} pagantes
+            </p>
           </div>
 
           <div className="bg-slate-800/50 border border-slate-700/60 p-5 rounded-2xl relative overflow-hidden backdrop-blur">
@@ -298,7 +332,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                 businessesList.filter((b) => b.paymentStatus === "active" && !b.isDemo).length * 490
               ).toLocaleString("pt-BR")}
             </div>
-            <p className="text-xs text-slate-400 mt-1">Base de cálculo R$ 490/ano por clínica</p>
+            <p className="text-xs text-slate-400 mt-1">Base de cálculo R$ 490 por pagante</p>
           </div>
         </div>
 
@@ -317,24 +351,24 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              {["all", "active", "pending", "demo"].map((status) => (
+            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+              {[
+                { id: "all", label: "Todos" },
+                { id: "active", label: "Pagantes" },
+                { id: "gift", label: "Cortesias 🎁" },
+                { id: "pending", label: "Pendentes" },
+                { id: "demo", label: "Demonstração" },
+              ].map(({ id, label }) => (
                 <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg capitalize transition-colors cursor-pointer ${
-                    filterStatus === status
+                  key={id}
+                  onClick={() => setFilterStatus(id)}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
+                    filterStatus === id
                       ? "bg-blue-600 text-white"
                       : "bg-slate-800 text-slate-400 hover:text-slate-200"
                   }`}
                 >
-                  {status === "all"
-                    ? "Todos"
-                    : status === "active"
-                    ? "Ativos"
-                    : status === "pending"
-                    ? "Pendentes"
-                    : "Demonstração"}
+                  {label}
                 </button>
               ))}
             </div>
@@ -407,13 +441,20 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     <td className="py-4 px-4 text-center">
                       <button
                         onClick={() => handleToggleStatus(b.id, b.paymentStatus)}
+                        title="Clique para alternar (Ativo -> Cortesia -> Pendente)"
                         className={`text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
-                          b.paymentStatus === "active"
+                          b.paymentStatus === "gift"
+                            ? "bg-purple-500/10 text-purple-300 border-purple-500/30 hover:bg-purple-500/20"
+                            : b.paymentStatus === "active"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
                             : "bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20"
                         }`}
                       >
-                        {b.paymentStatus === "active" ? "Ativo" : "Pendente"}
+                        {b.paymentStatus === "gift"
+                          ? "🎁 Cortesia"
+                          : b.paymentStatus === "active"
+                          ? "Ativo"
+                          : "Pendente"}
                       </button>
                     </td>
 
@@ -556,24 +597,41 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                 <input
                   type="url"
                   required
-                  placeholder="https://g.page/r/ou https://search.google.com/local/writereview..."
+                  placeholder="https://g.page/r/ ou https://search.google.com/local/writereview..."
                   value={form.googleReviewUrl}
                   onChange={(e) => setForm({ ...form, googleReviewUrl: e.target.value })}
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  WhatsApp para Alertas de Crítica (1 a 3 estrelas)
-                </label>
-                <input
-                  type="tel"
-                  placeholder="11999999999 (com DDD)"
-                  value={form.notificationPhone}
-                  onChange={(e) => setForm({ ...form, notificationPhone: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    WhatsApp Alertas (1 a 3 estrelas)
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="11999999999 (com DDD)"
+                    value={form.notificationPhone}
+                    onChange={(e) => setForm({ ...form, notificationPhone: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Tipo de Conta / Pagamento
+                  </label>
+                  <select
+                    value={form.paymentStatus}
+                    onChange={(e) => setForm({ ...form, paymentStatus: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="active">Ativo (Pagante R$ 490)</option>
+                    <option value="gift">🎁 Cortesia / Amigo / Teste Grátis</option>
+                    <option value="pending">Pendente (Aguardando Pagamento)</option>
+                  </select>
+                </div>
               </div>
 
               <div className="pt-2 flex justify-end gap-3">
@@ -610,17 +668,25 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                <CheckCircle2 className="w-6 h-6" />
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  welcomeModalData.isGift
+                    ? "bg-purple-500/20 border border-purple-500/30 text-purple-400"
+                    : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
+                }`}
+              >
+                {welcomeModalData.isGift ? <Gift className="w-6 h-6" /> : <CheckCircle2 className="w-6 h-6" />}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Cliente Cadastrado com Sucesso!</h3>
+                <h3 className="text-lg font-bold text-white">
+                  {welcomeModalData.isGift ? "Licença Cortesia Criada!" : "Cliente Cadastrado com Sucesso!"}
+                </h3>
                 <p className="text-xs text-slate-400">{welcomeModalData.name} já está no ar</p>
               </div>
             </div>
 
             <p className="text-xs text-slate-300 mb-3">
-              Copie a mensagem abaixo e envie diretamente no WhatsApp do Dr. Marcos / Gerente. Ele não precisa de senha manual!
+              Copie a mensagem abaixo e envie diretamente no WhatsApp do cliente/amigo. Ele não precisa de senha manual!
             </p>
 
             <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto mb-4 select-all">

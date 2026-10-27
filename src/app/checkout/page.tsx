@@ -10,7 +10,11 @@ import {
   QrCode,
   ArrowRight,
   Sparkles,
+  Tag,
+  Gift,
 } from "lucide-react";
+
+const VALID_COUPONS = ["THYAGO100", "CORTESIA", "TESTE100", "VIP100", "PRESENTE"];
 
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
@@ -21,7 +25,28 @@ export default function CheckoutPage() {
     email: "",
     cpfCnpj: "",
     phone: "",
+    coupon: "",
   });
+
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+
+  const handleApplyCoupon = () => {
+    setCouponError(null);
+    const code = couponInput.trim().toUpperCase();
+
+    if (!code) return;
+
+    if (VALID_COUPONS.includes(code)) {
+      setAppliedCoupon(code);
+      setForm((prev) => ({ ...prev, coupon: code }));
+    } else {
+      setCouponError("Cupom inválido ou expirado.");
+    }
+  };
+
+  const isFree = Boolean(appliedCoupon);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +57,10 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          coupon: appliedCoupon || form.coupon,
+        }),
       });
 
       const data = await res.json();
@@ -58,10 +86,12 @@ export default function CheckoutPage() {
           <Logo variant="dark" showRatingBadge={true} />
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Ativação Segura do NotaLocal
+          {isFree ? "Ativação de Cortesia NotaLocal" : "Ativação Segura do NotaLocal"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-400">
-          Pagamento processado com segurança bancária pelo Asaas.
+          {isFree
+            ? "Licença cortesia aplicada com 100% de desconto."
+            : "Pagamento processado com segurança bancária pelo Asaas."}
         </p>
       </div>
 
@@ -78,14 +108,58 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          <div className="py-4 border-y border-slate-700/80 space-y-1">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 490</span>
-              <span className="text-xs text-slate-400">à vista no Pix</span>
+          <div className="py-4 border-y border-slate-700/80 space-y-2">
+            {isFree ? (
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-purple-400">GRÁTIS</span>
+                  <span className="text-xs line-through text-slate-500">R$ 490</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-purple-300 font-semibold mt-1">
+                  <Gift className="w-4 h-4 text-purple-400" />
+                  <span>Cupom {appliedCoupon} aplicado (100% OFF)</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 490</span>
+                  <span className="text-xs text-slate-400">à vista no Pix</span>
+                </div>
+                <p className="text-xs text-emerald-400 font-semibold">
+                  ou em até <strong>12x de R$ 48,90</strong> no cartão de crédito
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* Campo de Cupom */}
+          <div className="pt-1">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-blue-400" /> Possui cupom de cortesia ou desconto?
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Ex: CORTESIA ou THYAGO100"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white uppercase font-mono focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                className="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors cursor-pointer"
+              >
+                Aplicar
+              </button>
             </div>
-            <p className="text-xs text-emerald-400 font-semibold">
-              ou em até <strong>12x de R$ 48,90</strong> no cartão de crédito
-            </p>
+            {couponError && <p className="text-xs text-red-400 mt-1">{couponError}</p>}
+            {isFree && (
+              <p className="text-xs text-emerald-400 mt-1.5 flex items-center gap-1">
+                <Check className="w-3.5 h-3.5" /> Cupom ativado! Nenhum valor será cobrado.
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -113,9 +187,13 @@ export default function CheckoutPage() {
 
         {/* Coluna 2: Formulário de Checkout */}
         <div className="md:col-span-7 bg-white text-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-100">
-          <h3 className="text-lg font-bold text-slate-900 mb-1">Dados de Faturamento</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">
+            {isFree ? "Dados para Ativação da Licença" : "Dados de Faturamento"}
+          </h3>
           <p className="text-xs text-slate-500 mb-6">
-            Preencha seus dados para emissão da cobrança e ativação do painel.
+            {isFree
+              ? "Preencha seus dados para vincular seu painel gratuito."
+              : "Preencha seus dados para emissão da cobrança e ativação do painel."}
           </p>
 
           {error && (
@@ -141,12 +219,12 @@ export default function CheckoutPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                E-mail para Recebimento da Fatura e Acesso
+                E-mail para Acesso ao Painel
               </label>
               <input
                 type="email"
                 required
-                placeholder="Ex: financeiro@suaempresa.com.br"
+                placeholder="Ex: contato@suaempresa.com.br"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
@@ -156,11 +234,11 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  CPF ou CNPJ (para a fatura)
+                  CPF ou CNPJ {isFree && "(Opcional)"}
                 </label>
                 <input
                   type="text"
-                  required
+                  required={!isFree}
                   placeholder="000.000.000-00"
                   value={form.cpfCnpj}
                   onChange={(e) => setForm({ ...form, cpfCnpj: e.target.value })}
@@ -170,11 +248,11 @@ export default function CheckoutPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  WhatsApp com DDD
+                  Celular / WhatsApp (Opcional)
                 </label>
                 <input
                   type="tel"
-                  placeholder="(15) 99999-9999"
+                  placeholder="(11) 99999-9999"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
@@ -186,23 +264,38 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                className={`w-full py-4 px-6 rounded-2xl text-white font-bold text-sm shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-50 ${
+                  isFree
+                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-600/30"
+                    : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-600/30"
+                }`}
               >
                 {loading ? (
-                  <span>Processando...</span>
+                  <span>Processando ativação...</span>
+                ) : isFree ? (
+                  <>
+                    <Gift className="w-5 h-5" />
+                    <span>Ativar Licença Cortesia Gratuita</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </>
                 ) : (
                   <>
-                    <span>Ir para Pagamento Seguro</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <CreditCard className="w-5 h-5" />
+                    <span>Continuar para Pagamento Asaas (Pix ou Cartão)</span>
+                    <ArrowRight className="w-4 h-4 ml-1" />
                   </>
                 )}
               </button>
-            </div>
 
-            <div className="pt-2 text-center">
-              <p className="text-[11px] text-slate-400">
-                Ao clicar, você poderá escolher entre <strong>Pix Instantâneo</strong>, <strong>Cartão em até 12x</strong> ou <strong>Boleto</strong>.
-              </p>
+              <div className="mt-4 flex items-center justify-center gap-4 text-xs text-slate-500">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" /> Garantia de 7 dias
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <QrCode className="w-4 h-4 text-blue-500" /> Liberação Imediata
+                </span>
+              </div>
             </div>
           </form>
         </div>

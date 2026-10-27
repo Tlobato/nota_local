@@ -1,19 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAsaasCustomer, createAsaasPayment } from "@/lib/asaas";
 
+const VALID_COUPONS = ["THYAGO100", "CORTESIA", "TESTE100", "VIP100", "PRESENTE"];
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, cpfCnpj, phone, plan } = body;
+    const { name, email, cpfCnpj, phone, coupon } = body;
 
-    if (!name || !email || !cpfCnpj) {
+    if (!name || !email) {
       return NextResponse.json(
-        { error: "Nome, e-mail e CPF/CNPJ são obrigatórios para a emissão do pagamento." },
+        { error: "Nome e e-mail são obrigatórios." },
         { status: 400 }
       );
     }
 
-    // Se o Asaas não estiver configurado ainda (ambiente de dev/teste sem chave), simula
+    const cleanCoupon = coupon?.trim().toUpperCase();
+    const isFreeCoupon = cleanCoupon && VALID_COUPONS.includes(cleanCoupon);
+
+    // Se usou um cupom de 100% de cortesia/teste, libera instantaneamente sem cobrar nada
+    if (isFreeCoupon) {
+      return NextResponse.json({
+        success: true,
+        isFree: true,
+        message: `Cupom ${cleanCoupon} aplicado! Licença cortesia 100% gratuita liberada.`,
+        paymentUrl: "/onboarding?status=gift",
+      });
+    }
+
+    // Caso não seja cupom cortesia, CPF/CNPJ é necessário para o Asaas
+    if (!cpfCnpj) {
+      return NextResponse.json(
+        { error: "CPF ou CNPJ é obrigatório para emissão da cobrança bancária." },
+        { status: 400 }
+      );
+    }
+
+    // Se o Asaas não estiver configurado (ambiente sem chave), simula
     if (!process.env.ASAAS_API_KEY) {
       return NextResponse.json({
         success: true,

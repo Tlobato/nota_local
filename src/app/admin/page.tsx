@@ -4,6 +4,8 @@ import { desc, eq, or } from "drizzle-orm";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, Shield } from "lucide-react";
 
 interface AdminPageProps {
   searchParams: Promise<{
@@ -12,12 +14,30 @@ interface AdminPageProps {
   }>;
 }
 
+const ADMIN_EMAILS = [
+  "thyagollobato@gmail.com",
+  ...(process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(",").map((e) => e.trim().toLowerCase()) : []),
+];
+
 export default async function AdminPage({ searchParams }: AdminPageProps) {
   const params = await searchParams;
   const session = await auth();
   const userId = session?.userId;
 
   let currentBusiness = null;
+  let userEmail: string | undefined = undefined;
+
+  if (userId) {
+    const user = await currentUser();
+    userEmail = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase().trim();
+  }
+
+  const isSuperAdmin = userEmail && ADMIN_EMAILS.includes(userEmail);
+
+  // Se o Thyago logou e acessou /admin sem especificar um cliente específico, redireciona para o Super Admin
+  if (isSuperAdmin && !params.businessId && params.demo !== "true") {
+    redirect("/super-admin");
+  }
 
   // 1. Se foi solicitada a visualização de demonstração
   if (params.demo === "true") {
@@ -35,9 +55,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   // 3. Se o usuário estiver autenticado, buscar pela conta dele
   if (!currentBusiness && userId) {
-    const user = await currentUser();
-    const userEmail = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase().trim();
-
     // Buscar onde o ownerId é o userId OU o ownerEmail é o email cadastrado pelo Super Admin
     if (userEmail) {
       currentBusiness = await db.query.businesses.findFirst({
@@ -65,7 +82,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   // 5. Se não achou empresa e não está logado, direcionar para login
   if (!currentBusiness) {
-    // Se for modo de demonstração geral e existir clinica demo
     const demoBusiness = await db.query.businesses.findFirst({
       where: eq(businesses.isDemo, true),
     });
@@ -84,10 +100,32 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   });
 
   return (
-    <AdminDashboard
-      initialBusiness={currentBusiness}
-      initialFeedbacks={allFeedbacks}
-      allBusinesses={[currentBusiness]}
-    />
+    <div className="flex flex-col min-h-screen">
+      {/* Banner se o Thyago estiver inspecionando uma empresa pelo Super Admin */}
+      {isSuperAdmin && (
+        <div className="bg-slate-900 border-b border-slate-800 text-slate-200 px-6 py-2.5 flex items-center justify-between text-xs sticky top-0 z-50">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-blue-400" />
+            <span>
+              Você está visualizando o painel de:{" "}
+              <strong className="text-white">{currentBusiness.name}</strong>
+            </span>
+          </div>
+          <Link
+            href="/super-admin"
+            className="flex items-center gap-1.5 font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Voltar ao Super Admin
+          </Link>
+        </div>
+      )}
+
+      <AdminDashboard
+        initialBusiness={currentBusiness}
+        initialFeedbacks={allFeedbacks}
+        allBusinesses={[currentBusiness]}
+      />
+    </div>
   );
 }
