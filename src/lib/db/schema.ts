@@ -2,6 +2,7 @@ import { pgTable, text, timestamp, integer, boolean, uuid } from "drizzle-orm/pg
 
 export const businesses = pgTable("businesses", {
   id: uuid("id").defaultRandom().primaryKey(),
+  ownerId: text("owner_id"), // Clerk User ID (auth)
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   category: text("category").default("Estabelecimento"),
@@ -11,6 +12,9 @@ export const businesses = pgTable("businesses", {
   notificationPhone: text("notification_phone"), // WhatsApp do gerente para alerta imediato (ex: 5515999999999)
   notificationEmail: text("notification_email"),
   welcomeMessage: text("welcome_message").default("Como foi sua experiência conosco hoje?"),
+  paymentStatus: text("payment_status").default("active"), // pending, active, cancelled
+  asaasCustomerId: text("asaas_customer_id"),
+  asaasPaymentId: text("asaas_payment_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -47,7 +47,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Logo variant="dark" showRatingBadge={true} />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               href="/admin"
               className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
@@ -56,9 +56,15 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/clinica-sorriso"
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-blue-600/30 transition-all"
+              className="hidden sm:inline-block text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
             >
-              Ver Demo ao Vivo
+              Ver Demo
+            </Link>
+            <Link
+              href="/checkout"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all"
+            >
+              Ativar Meu Negócio
             </Link>
           </div>
         </div>
@@ -243,23 +249,23 @@ export default function LandingPage() {
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-900 to-slate-950 text-center border-t border-slate-800">
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-3xl font-extrabold text-white">
-            Pronto para ver na prática com a sua empresa?
+            Pronto para blindar a nota do seu negócio?
           </h2>
           <p className="text-sm text-slate-400">
-            Acesse a página de demonstração modelo ou explore o painel administrativo.
+            Comece a multiplicar avaliações 5 estrelas hoje mesmo por apenas R$ 490 (em até 12x no cartão ou Pix).
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <Link
-              href="/clinica-sorriso"
-              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all"
+              href="/checkout"
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25"
             >
-              Testar Página Modelo (Clínica Sorriso)
+              Ativar Meu Estabelecimento
             </Link>
             <Link
-              href="/admin"
-              className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
+              href="/clinica-sorriso"
+              className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
             >
-              Acessar Painel do Gestor
+              Ver Demo ao Vivo
             </Link>
           </div>
         </div>
