@@ -84,6 +84,49 @@ export default function SuperAdminDashboard({
     paymentStatus: "active",
   });
 
+  // Categorias predefinidas completas
+  const CATEGORY_OPTIONS = [
+    "Clínica Odontológica / Dentista",
+    "Clínica Médica / Consultório",
+    "Estética / Harmonização / Dermatologia",
+    "Confeitaria / Doceria / Padaria",
+    "Restaurante / Hamburgueria / Pizzaria",
+    "Bar / Cafeteria / Bistrô",
+    "Barbearia / Salão de Beleza",
+    "Design / Gráfica / Comunicação Visual",
+    "Pet Shop / Clínica Veterinária",
+    "Academia / Studio / Crossfit",
+    "Oficina Mecânica / Auto Center",
+    "Escritório de Advocacia",
+    "Contabilidade / Consultoria",
+    "Imobiliária / Corretor",
+    "Hotel / Pousada",
+    "Outro (Personalizado)",
+  ];
+
+  const [customCategory, setCustomCategory] = useState("");
+
+  // Máscara dinâmica de telefone brasileiro (DDD) XXXXX-XXXX
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const masked = formatPhone(e.target.value);
+    setForm((prev) => ({ ...prev, notificationPhone: masked }));
+  };
+
+  // Verificação de link do Google
+  const isGoogleLink = (url: string) => {
+    if (!url) return null;
+    const clean = url.trim().toLowerCase();
+    return clean.includes("google") || clean.includes("goo.gl");
+  };
+
   // Atualizar slug automaticamente com o nome
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -107,10 +150,17 @@ export default function SuperAdminDashboard({
     setFormError(null);
 
     try {
+      const finalCategory =
+        form.category === "Outro (Personalizado)" ? customCategory.trim() || "Negócio Local" : form.category;
+
       const res = await fetch("/api/super-admin/businesses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          category: finalCategory,
+          notificationPhone: form.notificationPhone.replace(/\D/g, ""),
+        }),
       });
 
       const data = await res.json();
@@ -556,22 +606,37 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Categoria
+                    Categoria do Negócio
                   </label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                   >
-                    <option value="Clínica Odontológica">Clínica Odontológica</option>
-                    <option value="Clínica Médica">Clínica Médica / Estética</option>
-                    <option value="Restaurante / Bar">Restaurante / Bar</option>
-                    <option value="Barbearia / Salão">Barbearia / Salão</option>
-                    <option value="Oficina Mecânica">Oficina Mecânica</option>
-                    <option value="Outro Negócio">Outro Negócio Local</option>
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
+
+              {form.category === "Outro (Personalizado)" && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Especifique a Categoria / Nicho *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Comunicação Visual, Confeitaria Gourmet..."
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    className="w-full bg-slate-800 border border-blue-500/50 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -586,36 +651,65 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                   className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 font-mono"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  O cliente só precisará entrar usando este e-mail no Google ou via código seguro.
+                  O cliente só precisará entrar usando este e-mail no Google ou via código de 6 dígitos.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Link de Avaliação do Google Meu Negócio *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Link de Avaliação do Google Meu Negócio *
+                  </label>
+                  {form.googleReviewUrl && (
+                    <a
+                      href={form.googleReviewUrl.startsWith("http") ? form.googleReviewUrl : `https://${form.googleReviewUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Testar Link ↗
+                    </a>
+                  )}
+                </div>
                 <input
                   type="url"
                   required
-                  placeholder="https://g.page/r/ ou https://search.google.com/local/writereview..."
+                  placeholder="https://g.page/r/... ou https://search.google.com/local/writereview..."
                   value={form.googleReviewUrl}
                   onChange={(e) => setForm({ ...form, googleReviewUrl: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                  className={`w-full bg-slate-800 border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none transition-colors ${
+                    form.googleReviewUrl && !isGoogleLink(form.googleReviewUrl)
+                      ? "border-amber-500/60 focus:border-amber-500"
+                      : "border-slate-700 focus:border-blue-500"
+                  }`}
                 />
+                {form.googleReviewUrl && !isGoogleLink(form.googleReviewUrl) ? (
+                  <p className="text-[11px] text-amber-400 mt-1 flex items-center gap-1">
+                    <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                    Atenção: este link não parece ser do Google. Use o botão &quot;Testar Link&quot; para confirmar.
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Para onde os clientes que derem 4 ou 5 estrelas serão direcionados automaticamente.
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    WhatsApp Alertas (1 a 3 estrelas)
+                    WhatsApp do Responsável (Opcional)
                   </label>
                   <input
                     type="tel"
-                    placeholder="11999999999 (com DDD)"
+                    placeholder="(11) 98888-8888"
                     value={form.notificationPhone}
-                    onChange={(e) => setForm({ ...form, notificationPhone: e.target.value })}
+                    onChange={handlePhoneChange}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                   />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Receberá avisos se um cliente relatar insatisfação interna.
+                  </p>
                 </div>
 
                 <div>
