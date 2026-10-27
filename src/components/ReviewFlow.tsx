@@ -237,20 +237,19 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
             </div>
 
             <h3 className="text-base font-bold text-slate-800 mb-1">
-              Fale direto com a gerência
+              Como podemos melhorar?
             </h3>
             <p className="text-xs text-slate-500 mb-4">
-              Sua mensagem será lida diretamente pelos responsáveis pela {business.name}.
+              Conte o que aconteceu para que a equipe da {business.name} possa corrigir e evoluir nosso atendimento.
             </p>
 
             <form onSubmit={handleSubmitNegative} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Seu Nome
+                  Seu Nome (Opcional)
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="Ex: João da Silva"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
@@ -260,11 +259,10 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
 
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Seu WhatsApp / Telefone
+                  Seu WhatsApp ou Telefone (Opcional)
                 </label>
                 <input
                   type="tel"
-                  required
                   placeholder="Ex: (15) 99999-9999"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
@@ -274,7 +272,7 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
 
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  O que podemos fazer para melhorar?
+                  O que podemos fazer para melhorar? *
                 </label>
                 <textarea
                   required
@@ -290,13 +288,13 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm transition-all shadow-md disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm transition-all shadow-md disabled:opacity-50 cursor-pointer active:scale-[0.99]"
                 >
                   {loading ? (
-                    <span>Enviando...</span>
+                    <span>Enviando sua mensagem...</span>
                   ) : (
                     <>
-                      <span>Enviar para a Gerência</span>
+                      <span>Enviar Mensagem</span>
                       <Send className="w-3.5 h-3.5" />
                     </>
                   )}
@@ -306,7 +304,7 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
               <button
                 type="button"
                 onClick={() => setStep("rating")}
-                className="w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors pt-1"
+                className="w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors pt-1 cursor-pointer"
               >
                 Voltar e alterar nota
               </button>
@@ -317,14 +315,14 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
         {/* ETAPA 2C: AGRADECIMENTO CRÍTICA RETIDA */}
         {step === "negative_done" && (
           <div className="text-center py-6">
-            <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
             <h3 className="text-lg font-bold text-slate-900 mb-2">Mensagem recebida com sucesso!</h3>
             <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-              Agradecemos sinceramente pela sua honestidade. Seu recado já foi entregue à gerência da{" "}
-              <strong>{business.name}</strong> e entraremos em contato pelo seu telefone em breve para solucionar a situação.
+              Agradecemos sinceramente pela sua sinceridade. Seu relato foi registrado diretamente no canal de atendimento da{" "}
+              <strong>{business.name}</strong> para que possamos corrigir falhas e melhorar continuamente nossos serviços.
             </p>
 
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-500">
