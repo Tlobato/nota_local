@@ -73,14 +73,33 @@ export default function AdminDashboard({
   const [copiedScriptIndex, setCopiedScriptIndex] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Auto-refresh inteligente (a cada 20s e ao focar a aba) sem consumir recursos exagerados
+  // Auto-refresh inteligente com tripla proteção de custos e recursos
+  const lastActivityRef = useRef<number>(Date.now());
+  const lastFetchRef = useRef<number>(Date.now());
+
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    // 1. Rastreador de atividade do usuário (mouse, rolagem, clique, teclado)
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+    };
+
+    window.addEventListener("mousemove", updateActivity, { passive: true });
+    window.addEventListener("mousedown", updateActivity, { passive: true });
+    window.addEventListener("keydown", updateActivity, { passive: true });
+    window.addEventListener("scroll", updateActivity, { passive: true });
+    window.addEventListener("touchstart", updateActivity, { passive: true });
 
     const fetchLatestFeedbacks = async () => {
+      // Trava 1: Se a aba estiver em segundo plano ou minimizada, não executa
       if (document.visibilityState !== "visible") return;
+
+      // Trava 2: Se o usuário estiver inativo há mais de 2 minutos, pausa 100%
+      const isInactive = Date.now() - lastActivityRef.current > 120000;
+      if (isInactive) return;
+
       try {
         setIsRefreshing(true);
+        lastFetchRef.current = Date.now();
         const res = await fetch(`/api/feedback/poll?businessId=${currentBusiness.id}`);
         if (res.ok) {
           const data = await res.json();
@@ -89,21 +108,32 @@ export default function AdminDashboard({
           }
         }
       } catch (err) {
-        // Silencioso
+        // Silencioso para não incomodar o usuário
       } finally {
-        setTimeout(() => setIsRefreshing(false), 600);
+        setTimeout(() => setIsRefreshing(false), 500);
       }
     };
 
+    // Trava 3: Revalidação por Foco - quando a pessoa clica na aba, busca na hora (com throttle de 10s)
     const handleFocus = () => {
-      fetchLatestFeedbacks();
+      lastActivityRef.current = Date.now();
+      if (Date.now() - lastFetchRef.current > 10000) {
+        fetchLatestFeedbacks();
+      }
     };
 
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleFocus);
-    interval = setInterval(fetchLatestFeedbacks, 20000);
+
+    // Intervalo espaçado para 60 segundos (apenas se visível e ativo)
+    const interval = setInterval(fetchLatestFeedbacks, 60000);
 
     return () => {
+      window.removeEventListener("mousemove", updateActivity);
+      window.removeEventListener("mousedown", updateActivity);
+      window.removeEventListener("keydown", updateActivity);
+      window.removeEventListener("scroll", updateActivity);
+      window.removeEventListener("touchstart", updateActivity);
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleFocus);
       clearInterval(interval);
