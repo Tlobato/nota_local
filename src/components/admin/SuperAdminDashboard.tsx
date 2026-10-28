@@ -135,12 +135,17 @@ export default function SuperAdminDashboard({
   const [prospectError, setProspectError] = useState<string | null>(null);
   const [showPitchPlaybook, setShowPitchPlaybook] = useState(false);
   const [copiedPitch, setCopiedPitch] = useState(false);
+  const [copiedGatekeeperPitch, setCopiedGatekeeperPitch] = useState(false);
+
+  const GATEKEEPER_PITCH_TEXT = `Oi, bom dia! Tudo bem?
+Aqui é o Thyago, sou desenvolvedor aqui de Sorocaba. Eu criei uma ferramenta de triagem de avaliações no Google e fiz uma simulação rápida pensando na [Nome da Empresa].
+Você consegue encaminhar para o(a) [Nome do Responsável] (ou para quem cuida dessa parte com ele) se eu te mandar um link rapidinho aqui?`;
 
   const OFFICIAL_PITCH_TEXT = `Olá, tudo bem?
 
 Eu desenvolvi uma aplicação simples focada em ajudar empresas e clínicas a cuidarem melhor das avaliações no Google.
 
-A ideia é bem prática: quando você envia o link (ou o cliente lê o QR Code na recepção), o sistema faz uma triagem rápida. Se o cliente der 4 ou 5 estrelas, ele é direcionado direto para publicar o elogio no Google. Mas se ele der de 1 a 3 estrelas, em vez de ir pro Google, abre na hora uma ouvidoria privada direto com você — assim a pessoa já desabafa ali mesmo e você consegue contornar a situação antes de virar uma crítica pública.
+A ideia é bem prática: quando você envia o link (ou o cliente lê o QR Code na recepção), o sistema faz uma triagem rápida. Se o cliente der 4 ou 5 estrelas, ele é direcionado direto para publicar o elogio no Google. Mas se ele der de 1 a 3 estrelas, em vez de ir pro Google, abre na hora um canal privado direto com a empresa — assim a pessoa já desabafa ali mesmo e a equipe consegue contornar a situação antes de virar uma crítica pública.
 
 Deixei um simulador rápido no site onde dá para testar os dois cenários em 20 segundos: https://notalocal.vercel.app/#simulador
 
@@ -520,10 +525,20 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
     setIsModalOpen(true);
   };
 
-  const buildProspectWhatsAppUrl = (p: Prospect) => {
+  const buildProspectWhatsAppUrl = (
+    p: Prospect,
+    mode: "gatekeeper" | "direct" = "direct"
+  ) => {
     if (!p.phone) return null;
     const digits = p.phone.replace(/\D/g, "");
     const formatted = digits.startsWith("55") ? digits : `55${digits}`;
+
+    if (mode === "gatekeeper") {
+      const ownerTarget = p.contactName ? p.contactName : "responsável pela clínica/empresa";
+      const gatekeeperMsg = `Oi, bom dia! Tudo bem?\nAqui é o Thyago, sou desenvolvedor aqui de Sorocaba. Eu criei uma ferramenta de triagem de avaliações no Google e fiz uma simulação rápida pensando na ${p.businessName}.\nVocê consegue encaminhar para o(a) ${ownerTarget} (ou para quem cuida dessa parte com ele) se eu te mandar um link rapidinho aqui?`;
+      return `https://wa.me/${formatted}?text=${encodeURIComponent(gatekeeperMsg)}`;
+    }
+
     const salutation = p.contactName ? `Olá ${p.contactName}, tudo bem?` : `Olá, tudo bem?`;
     const pitchBody = OFFICIAL_PITCH_TEXT.replace(/^Olá, tudo bem\?/, salutation);
     return `https://wa.me/${formatted}?text=${encodeURIComponent(pitchBody)}`;
@@ -1048,7 +1063,29 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(GATEKEEPER_PITCH_TEXT);
+                        setCopiedGatekeeperPitch(true);
+                        setTimeout(() => setCopiedGatekeeperPitch(false), 2500);
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                    >
+                      {copiedGatekeeperPitch ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Copiar (Recepção)</span>
+                        </>
+                      )}
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -1066,7 +1103,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       ) : (
                         <>
                           <FileText className="w-3.5 h-3.5" />
-                          <span>Copiar Abordagem</span>
+                          <span>Copiar (Direto Dono)</span>
                         </>
                       )}
                     </button>
@@ -1076,19 +1113,30 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       onClick={() => setShowPitchPlaybook(!showPitchPlaybook)}
                       className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 cursor-pointer transition-colors"
                     >
-                      {showPitchPlaybook ? "Ocultar Roteiro" : "Ver Texto & Estatísticas"}
+                      {showPitchPlaybook ? "Ocultar Roteiro" : "Ver Textos & Estatísticas"}
                     </button>
                   </div>
                 </div>
 
                 {showPitchPlaybook && (
                   <div className="mt-4 pt-4 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-4 animate-in fade-in duration-150">
-                    <div className="lg:col-span-7 space-y-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 block">
-                        Mensagem Oficial de 1º Contato (WhatsApp / Direct):
-                      </span>
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans select-all">
-                        {OFFICIAL_PITCH_TEXT}
+                    <div className="lg:col-span-7 space-y-3">
+                      <div className="space-y-1.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400 block">
+                          Opção 1 — Passar pela Recepção / Atendente (Clínicas):
+                        </span>
+                        <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans select-all">
+                          {GATEKEEPER_PITCH_TEXT}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 block">
+                          Opção 2 — Falar Direto com o Dono (ou Passo 2 após recepção liberar):
+                        </span>
+                        <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans select-all">
+                          {OFFICIAL_PITCH_TEXT}
+                        </div>
                       </div>
                     </div>
 
@@ -1214,7 +1262,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                   {filteredProspects.map((p) => {
                     const statusObj =
                       PROSPECT_STATUSES.find((s) => s.id === p.status) || PROSPECT_STATUSES[0];
-                    const zapUrl = buildProspectWhatsAppUrl(p);
+                    const zapGatekeeperUrl = buildProspectWhatsAppUrl(p, "gatekeeper");
+                    const zapDirectUrl = buildProspectWhatsAppUrl(p, "direct");
                     const followUpOverdue = p.status !== "won" && isFollowUpDue(p.nextFollowUpDate);
 
                     return (
@@ -1346,15 +1395,29 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
                           {/* Botões de Ação */}
                           <div className="flex flex-wrap items-center gap-2">
-                            {zapUrl && (
+                            {zapGatekeeperUrl && (
                               <a
-                                href={zapUrl}
+                                href={zapGatekeeperUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                title="Envia mensagem curta para a recepcionista pedindo para encaminhar ao responsável"
+                                className="px-2.5 py-1.5 rounded-xl bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/40 text-teal-300 font-bold text-xs flex items-center gap-1.5 transition-colors"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                <span>Zap (Recepção)</span>
+                              </a>
+                            )}
+
+                            {zapDirectUrl && (
+                              <a
+                                href={zapDirectUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Envia o texto completo de abordagem direto para o dono/decisor"
                                 className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors"
                               >
                                 <MessageCircle className="w-3.5 h-3.5" />
-                                <span>Chamar no Zap</span>
+                                <span>Zap (Direto Dono)</span>
                               </a>
                             )}
 

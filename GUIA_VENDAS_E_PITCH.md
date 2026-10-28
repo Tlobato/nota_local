@@ -6,14 +6,19 @@ Este documento guarda o **Roteiro Oficial de Abordagem (WhatsApp/Instagram)** e 
 
 ---
 
-## 📲 1. Mensagem Oficial de 1º Contato (WhatsApp)
+## 📲 1. Mensagens Oficiais de 1º Contato (WhatsApp / Direct)
 
-> **Por que essa mensagem funciona:**
-> - **Zero tom agressivo ou comparativo:** Começa com um elogio genuíno à nota da empresa.
-> - **Honesta e transparente:** Explica exatamente o que o sistema faz (um filtro prévio com canal direto de ouvidoria para 1 a 3 estrelas e redirecionamento para o Google em 4 e 5 estrelas), sem prometer "bloqueio mágico" do Google.
-> - **Conexão local natural:** Menciona que você é da região apenas no fechamento, gerando empatia sem parecer forçado.
+### Opção 1 — Passar pela Recepção / Secretária (Clínicas e Consultórios)
+> **Quando usar:** Quando o WhatsApp encontrado no Google Maps é o número de agendamento/recepção da clínica. A mensagem é curta, educada e cita o nome do dono para que a recepcionista encaminhe a você em vez de bloquear.
 
-### Texto para Copiar:
+```text
+Oi, bom dia! Tudo bem?
+Aqui é o Thyago, sou desenvolvedor aqui de Sorocaba. Eu criei uma ferramenta de triagem de avaliações no Google e fiz uma simulação rápida pensando na [Nome da Empresa].
+Você consegue encaminhar para o(a) [Nome do Responsável] (ou para quem cuida dessa parte com ele) se eu te mandar um link rapidinho aqui?
+```
+
+### Opção 2 — Falar Direto com o Dono / Decisor (ou Passo 2 após a recepção liberar)
+> **Quando usar:** Quando o número já é do próprio dono (ex: barbearia, estética automotiva, confeitaria), quando você manda no Direct do Instagram pessoal/profissional do doutor(a), ou logo depois que a secretária responde *"Pode mandar aqui que eu encaminho para ele!"*.
 
 ```text
 Olá, tudo bem?
