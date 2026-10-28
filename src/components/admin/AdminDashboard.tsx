@@ -52,12 +52,17 @@ export default function AdminDashboard({
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Customização do Display / Plaquinha de Balcão
+  const [displayBusinessName, setDisplayBusinessName] = useState(currentBusiness.name);
   const [displayHeadline, setDisplayHeadline] = useState("Sua opinião vale muito para nós!");
   const [displaySubheadline, setDisplaySubheadline] = useState(
     "Aponte a câmera do seu celular para o QR Code abaixo e nos avalie em 30 segundos:"
   );
   const [showDisplaySettings, setShowDisplaySettings] = useState(false);
   const [downloadingPlate, setDownloadingPlate] = useState(false);
+
+  useEffect(() => {
+    setDisplayBusinessName(currentBusiness.name);
+  }, [currentBusiness.name]);
 
   // WhatsApp quick dispatch state
   const [dispatchName, setDispatchName] = useState("");
@@ -301,6 +306,7 @@ export default function AdminDashboard({
   const handlePrintDisplay = () => {
     if (!canvasRef.current) return;
     const qrDataUrl = canvasRef.current.toDataURL("image/png");
+    const businessNameToShow = displayBusinessName.trim() || currentBusiness.name;
     const printWindow = window.open("", "_blank", "width=850,height=950");
     if (!printWindow) {
       alert("Por favor, permita pop-ups no seu navegador para imprimir a plaquinha.");
@@ -311,7 +317,7 @@ export default function AdminDashboard({
       <html lang="pt-BR">
         <head>
           <meta charset="utf-8" />
-          <title>Display de Balcão - ${currentBusiness.name}</title>
+          <title>Display de Balcão - ${businessNameToShow}</title>
           <style>
             @page {
               size: A5 portrait;
@@ -409,7 +415,7 @@ export default function AdminDashboard({
           <div class="plate-container">
             <div class="accent-bar"></div>
             <div class="stars">★★★★★</div>
-            <div class="business-name">${currentBusiness.name}</div>
+            <div class="business-name">${businessNameToShow}</div>
             <div class="headline">${displayHeadline}</div>
             <div class="subheadline">${displaySubheadline}</div>
             <div class="qr-wrapper">
@@ -469,9 +475,10 @@ export default function AdminDashboard({
       ctx.fillText("★ ★ ★ ★ ★", width / 2, 175);
 
       // Nome da Empresa
+      const businessNameToShow = displayBusinessName.trim() || currentBusiness.name;
       ctx.fillStyle = "#1e293b";
       ctx.font = "bold 58px system-ui, -apple-system, sans-serif";
-      ctx.fillText(currentBusiness.name, width / 2, 265);
+      ctx.fillText(businessNameToShow, width / 2, 265);
 
       // Função de quebra de linhas para canvas
       const drawWrappedText = (
@@ -1103,7 +1110,23 @@ export default function AdminDashboard({
 
                 {/* Painel de Personalização de Textos (Opcional / Expansível) */}
                 {showDisplaySettings && (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3 animate-in fade-in duration-150 text-xs">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3.5 animate-in fade-in duration-150 text-xs">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Nome da Empresa exibido na Placa:
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Paola Bolos"
+                        value={displayBusinessName}
+                        onChange={(e) => setDisplayBusinessName(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                      />
+                      <p className="text-[10px] text-slate-400 mt-1">
+                        Ajuste maiúsculas, espaços ou adicione um slogan (Ex: &quot;Paola Bolos &bull; Doceria&quot;).
+                      </p>
+                    </div>
+
                     <div>
                       <label className="block font-semibold text-slate-700 mb-1">
                         Título Principal da Plaquinha:
@@ -1172,7 +1195,7 @@ export default function AdminDashboard({
 
                     {/* Nome da Empresa */}
                     <h4 className="text-base font-extrabold text-slate-800 tracking-tight">
-                      {currentBusiness.name}
+                      {displayBusinessName.trim() || currentBusiness.name}
                     </h4>
 
                     {/* Chamadas configuráveis */}
