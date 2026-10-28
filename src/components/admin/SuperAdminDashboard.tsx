@@ -1099,7 +1099,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 text-xs text-slate-300 leading-relaxed">
                         <p>
                           <strong className="text-white">1. O Efeito &quot;Válvula de Escape&quot; (80%+):</strong>{" "}
-                          Mais de 80% dos clientes insatisfeitos não vão ao Google por maldade; eles só reclamam em público quando não encontram um canal direto para serem ouvidos pela gerência na hora. Ao desabafar na nossa Ouvidoria Privada, a pessoa sente que já cumpriu seu objetivo.
+                          Mais de 80% dos clientes insatisfeitos não vão ao Google por maldade; eles só reclamam em público quando não encontram um canal direto para serem ouvidos pela empresa na hora. Ao desabafar no canal de atendimento interno, a pessoa sente que já cumpriu seu objetivo.
                         </p>
                         <p>
                           <strong className="text-white">2. Recuperação de Clientes (70% a 90%):</strong>{" "}

@@ -18,26 +18,23 @@ Este documento guarda o **Roteiro Oficial de Abordagem (WhatsApp/Instagram)** e 
 ```text
 Olá, tudo bem?
 
-Estava vendo o perfil da [Nome da Empresa] no Google e vi que o trabalho de vocês é super bem avaliado (nota [Nota]!). Parabéns pelo cuidado com os clientes.
+Eu desenvolvi uma aplicação simples focada em ajudar empresas e clínicas a cuidarem melhor das avaliações no Google.
 
-Trabalho com uma ferramenta simples focada em ajudar clínicas e comércios a aumentarem o volume de avaliações 5 estrelas no Google com mais segurança.
+A ideia é bem prática: quando você envia o link (ou o cliente lê o QR Code na recepção), o sistema faz uma triagem rápida. Se o cliente der 4 ou 5 estrelas, ele é direcionado direto para publicar o elogio no Google. Mas se ele der de 1 a 3 estrelas, em vez de ir pro Google, abre na hora um canal privado direto com a empresa — assim a pessoa já desabafa ali mesmo e a equipe consegue contornar a situação antes de virar uma crítica pública.
 
-Funciona assim: quando você envia nosso link ou QR Code de avaliação para os clientes, quem marca 4 ou 5 estrelas vai direto para a página do Google de vocês publicar o elogio. Já se alguém marcar de 1 a 3 estrelas por algum imprevisto, em vez de ser jogado direto pro Google, abre na hora uma caixa de Ouvidoria Privada para a pessoa desabafar direto com a gerência de vocês.
+Deixei um simulador rápido no site onde dá para testar os dois cenários em 20 segundos: https://notalocal.vercel.app/#simulador
 
-Se tiver 30 segundinhos, testa a simulação rápida aqui na nossa página (tenta clicar em 2 estrelas e depois em 5 estrelas pra ver como o filtro funciona na prática):
-👉 https://notalocal.vercel.app/#simulador
-
-Sou aqui da região de Sorocaba também! Se achar que faz sentido para a [Nome da Empresa], posso te mandar um vídeo rapidinho de 1 minuto mostrando o painel por dentro?
+Se achar que faz sentido para vocês, podemos conversar rapidamente sobre como funciona. Também sou daqui de Sorocaba, qualquer dúvida estou por aqui!
 ```
 
 ---
 
 ## 📊 2. Estatísticas de Ouro para o Pitch (Objeção: *"E se o cliente reclamar no painel e depois for no Google mesmo assim?"*)
 
-Se o dono do comércio perguntar se o cliente ainda pode ir ao Google depois de reclamar na Ouvidoria Privada, a resposta é **100% honesta e respaldada pelo comportamento do consumidor (efeito "válvula de escape" / catarse)**:
+Se o dono do comércio perguntar se o cliente ainda pode ir ao Google depois de reclamar no canal interno, a resposta é **100% honesta e respaldada pelo comportamento do consumidor (efeito "válvula de escape" / catarse)**:
 
 1. **Mais de 80% preferem resolver no privado quando têm canal fácil:**
-   Estudos de experiência do consumidor (*BrightLocal / Harvard Business Review*) mostram que **mais de 80% dos clientes insatisfeitos não têm como primeiro impulso "destruir" a empresa na internet** — eles só vão ao Google quando se sentem ignorados ou não encontram um canal rápido para falar com o responsável. Quando encontram uma **Ouvidoria Privada imediata** que avisa *"Sua mensagem vai direto para a gerência"*, a necessidade de expor em público cai drasticamente.
+   Estudos de experiência do consumidor (*BrightLocal / Harvard Business Review*) mostram que **mais de 80% dos clientes insatisfeitos não têm como primeiro impulso "destruir" a empresa na internet** — eles só vão ao Google quando se sentem ignorados ou não encontram um canal rápido para falar com a empresa. Quando encontram um **Canal Oficial de Atendimento** imediato onde podem relatar o ocorrido para a equipe corrigir, a necessidade de expor em público cai drasticamente.
 2. **70% a 90% de conversão em fidelidade quando respondidos rápido:**
    De acordo com levantamentos de *Service Recovery* (Recuperação de Clientes), entre **70% e 90% dos clientes** que fazem uma reclamação privada e **recebem um retorno rápido da empresa** (ex: o dono chamando no WhatsApp em seguida pelo botão do nosso painel para pedir desculpas ou alinhar a situação) não apenas deixam de reclamar publicamente, como **voltam a comprar**.
 3. **O verdadeiro perigo que o NotaLocal elimina (O "Tiro no Pé"):**

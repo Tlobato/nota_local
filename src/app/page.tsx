@@ -321,7 +321,7 @@ export default function LandingPage() {
                       Como podemos melhorar?
                     </h4>
                     <p className="text-[11px] text-slate-500">
-                      Sua mensagem vai direto para a gerência para resolvermos seu caso com prioridade.
+                      Conte o que aconteceu para que a nossa equipe possa corrigir e evoluir nosso atendimento.
                     </p>
                   </div>
 
@@ -356,15 +356,18 @@ export default function LandingPage() {
                         onChange={(e) => setDemoPhone(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 font-mono"
                       />
+                      <p className="text-[10px] text-slate-400 mt-1">
+                        Opcional: deixe seu número se desejar uma resposta direta da equipe.
+                      </p>
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        O que aconteceu em seu atendimento?
+                        O que podemos fazer para melhorar? *
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="Conte o que houve para podermos resolver..."
+                        placeholder="Conte com detalhes o que aconteceu em seu atendimento..."
                         value={demoComment}
                         onChange={(e) => setDemoComment(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 resize-none"
@@ -375,7 +378,7 @@ export default function LandingPage() {
                       type="submit"
                       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-md cursor-pointer"
                     >
-                      <span>Enviar Mensagem para a Gerência</span>
+                      <span>Enviar Mensagem</span>
                       <Send className="w-3.5 h-3.5" />
                     </button>
 
@@ -396,10 +399,10 @@ export default function LandingPage() {
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <h4 className="text-base font-bold text-slate-900">
-                    Mensagem recebida na Ouvidoria!
+                    Mensagem recebida com sucesso!
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Pronto! O cliente já desabafou aqui no canal privado (sem publicar no Google) e você recebe o relato no seu painel e por e-mail para chamá-lo no WhatsApp e reverter a situação!
+                    Pronto! O relato foi registrado diretamente no canal de atendimento da empresa (sem publicar no Google) e você recebe o alerta no painel e por e-mail para chamá-lo no WhatsApp e reverter a situação!
                   </p>
                   <button
                     type="button"
@@ -454,7 +457,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Resolução de Crises</h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                92% dos clientes que tiveram um problema voltam a comprar se forem ouvidos e tiverem sua queixa resolvida com rapidez pela gerência.
+                92% dos clientes que tiveram um problema voltam a comprar se forem ouvidos e tiverem sua queixa resolvida com rapidez pela equipe da empresa.
               </p>
             </div>
           </div>
