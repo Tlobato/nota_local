@@ -790,7 +790,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                   </label>
                   <input
                     type="tel"
-                    placeholder="(11) 98888-8888"
+                    placeholder="(11) 99999-9999"
                     value={form.notificationPhone}
                     onChange={handlePhoneChange}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"

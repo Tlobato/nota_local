@@ -263,7 +263,7 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
                 </label>
                 <input
                   type="tel"
-                  placeholder="(15) 99999-9999"
+                  placeholder="(11) 99999-9999"
                   value={customerPhone}
                   onChange={(e) => {
                     const digits = e.target.value.replace(/\D/g, "").slice(0, 11);

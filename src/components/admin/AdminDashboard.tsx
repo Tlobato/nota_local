@@ -1285,13 +1285,13 @@ export default function AdminDashboard({
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Paola Bolos"
+                        placeholder="Ex: Clínica Sorriso Perfeito"
                         value={displayBusinessName}
                         onChange={(e) => setDisplayBusinessName(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       />
                       <p className="text-[10px] text-slate-400 mt-1">
-                        Ajuste maiúsculas, espaços ou adicione um slogan (Ex: &quot;Paola Bolos &bull; Doceria&quot;).
+                        Ajuste maiúsculas, espaços ou adicione um slogan (Ex: &quot;Clínica Sorriso &bull; Odontologia&quot;).
                       </p>
                     </div>
 
@@ -1482,7 +1482,7 @@ export default function AdminDashboard({
                         </label>
                         <input
                           type="tel"
-                          placeholder="(11) 98222-7526"
+                          placeholder="(11) 99999-9999"
                           value={dispatchPhone}
                           onChange={handlePhoneChange}
                           maxLength={15}
@@ -1675,7 +1675,7 @@ export default function AdminDashboard({
                 </label>
                 <input
                   type="tel"
-                  placeholder="(11) 98888-8888"
+                  placeholder="(11) 99999-9999"
                   value={settingsForm.notificationPhone}
                   onChange={(e) =>
                     setSettingsForm({

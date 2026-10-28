@@ -20,7 +20,7 @@ async function seed() {
       category: "Odontologia & Estética Dental",
       coverColor: "#0284c7", // Sky 600
       googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4",
-      notificationPhone: "5515998383997",
+      notificationPhone: "5511999999999",
       notificationEmail: "contato@clinicasorriso.com.br",
       welcomeMessage: "Sua opinião é fundamental para nossa equipe! Como foi sua consulta hoje?",
     })

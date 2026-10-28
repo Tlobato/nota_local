@@ -126,7 +126,7 @@ export default function OnboardingPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Florido Odontologia"
+                  placeholder="Ex: Clínica Sorriso Perfeito"
                   value={form.name}
                   onChange={handleNameChange}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-900"
