@@ -29,6 +29,8 @@ export const feedbacks = pgTable("feedbacks", {
   customerPhone: text("customer_phone"),
   comment: text("comment"),
   status: text("status").default("pending"), // pending, contacted, resolved
+  resolutionNotes: text("resolution_notes"), // Anotações internas de como o caso foi resolvido
+  resolvedAt: timestamp("resolved_at"),
   redirectedToGoogle: boolean("redirected_to_google").default(false).notNull(),
   userAgent: text("user_agent"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -19,6 +19,12 @@ import {
   AlertCircle,
   ArrowUpRight,
   ShieldCheck,
+  Sparkles,
+  FileText,
+  CheckCircle2,
+  X,
+  Lightbulb,
+  RefreshCw,
 } from "lucide-react";
 import type { Business, Feedback } from "@/lib/db/schema";
 import QRCodeLib from "qrcode";
@@ -59,6 +65,51 @@ export default function AdminDashboard({
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
+  // Estados de gestão de feedbacks e scripts
+  const [selectedFeedbackForScripts, setSelectedFeedbackForScripts] = useState<Feedback | null>(null);
+  const [editingResolutionId, setEditingResolutionId] = useState<string | null>(null);
+  const [resolutionNotesInput, setResolutionNotesInput] = useState("");
+  const [savingResolution, setSavingResolution] = useState(false);
+  const [copiedScriptIndex, setCopiedScriptIndex] = useState<number | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Auto-refresh inteligente (a cada 20s e ao focar a aba) sem consumir recursos exagerados
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    const fetchLatestFeedbacks = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        setIsRefreshing(true);
+        const res = await fetch(`/api/feedback/poll?businessId=${currentBusiness.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.feedbacks) {
+            setFeedbacks(data.feedbacks);
+          }
+        }
+      } catch (err) {
+        // Silencioso
+      } finally {
+        setTimeout(() => setIsRefreshing(false), 600);
+      }
+    };
+
+    const handleFocus = () => {
+      fetchLatestFeedbacks();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+    interval = setInterval(fetchLatestFeedbacks, 20000);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+      clearInterval(interval);
+    };
+  }, [currentBusiness.id]);
+
   // Métricas calculadas
   const totalReviews = feedbacks.length;
   const positiveReviews = feedbacks.filter((f) => f.rating >= 4 || f.redirectedToGoogle).length;
@@ -96,20 +147,43 @@ export default function AdminDashboard({
     }
   };
 
-  const handleUpdateStatus = async (feedbackId: string, newStatus: string) => {
+  const handleUpdateStatus = async (feedbackId: string, newStatus: string, notes?: string) => {
     try {
+      const payload: Record<string, any> = { status: newStatus };
+      if (notes !== undefined) payload.resolutionNotes = notes;
+
       const res = await fetch(`/api/feedback/${feedbackId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setFeedbacks((prev) =>
-          prev.map((f) => (f.id === feedbackId ? { ...f, status: newStatus } : f))
+          prev.map((f) =>
+            f.id === feedbackId
+              ? {
+                  ...f,
+                  status: newStatus,
+                  resolutionNotes: notes !== undefined ? notes : f.resolutionNotes,
+                  resolvedAt: newStatus === "resolved" ? new Date() : null,
+                }
+              : f
+          )
         );
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleSaveResolution = async (feedbackId: string) => {
+    setSavingResolution(true);
+    try {
+      await handleUpdateStatus(feedbackId, "resolved", resolutionNotesInput.trim());
+      setEditingResolutionId(null);
+      setResolutionNotesInput("");
+    } finally {
+      setSavingResolution(false);
     }
   };
 
@@ -389,32 +463,42 @@ export default function AdminDashboard({
         {/* TAB 2: CRÍTICAS RETIDAS (OUVIDORIA) */}
         {activeTab === "feedbacks" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Críticas Retidas (Ouvidoria Privada)
-              </h2>
-              <p className="text-sm text-slate-500 mt-1">
-                Feedbacks de 1 a 3 estrelas que foram bloqueados do Google Maps para que você possa resolver antes de virar queixa pública.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  Críticas Retidas (Ouvidoria Privada)
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Feedbacks de 1 a 3 estrelas que foram bloqueados do Google Maps para que você possa resolver antes de virar queixa pública.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200/80 px-3 py-1.5 rounded-full shadow-xs shrink-0 self-start sm:self-auto">
+                <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshing ? "animate-spin" : ""}`} />
+                <span>Atualização automática ativa</span>
+              </div>
             </div>
 
             <div className="space-y-4">
               {feedbacks
                 .filter((f) => !f.redirectedToGoogle)
                 .map((f) => {
-                  const whatsappContactUrl = f.customerPhone
-                    ? `https://wa.me/55${f.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                        `Olá ${f.customerName || ""}! Aqui é a gerência da ${currentBusiness.name}. Vimos seu recado e pedimos desculpas pelo ocorrido. Gostaríamos de entender melhor para solucionar para você...`
+                  const hasPhone = Boolean(f.customerPhone);
+                  const cleanPhone = f.customerPhone ? f.customerPhone.replace(/\D/g, "") : "";
+                  const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
+                  const quickGreetUrl = hasPhone
+                    ? `https://wa.me/${formattedPhone}?text=${encodeURIComponent(
+                        `Olá ${f.customerName || ""}! Tudo bem?\n\nAqui é o atendimento da ${currentBusiness.name}. Vimos seu recado e fizemos questão de entrar em contato pessoalmente. Sentimos muito pela sua experiência e gostaríamos de entender exatamente para solucionar para você!`
                       )}`
                     : null;
 
                   return (
                     <div
                       key={f.id}
-                      className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between gap-4"
+                      className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4 transition-all hover:border-slate-300"
                     >
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-3">
+                      {/* Topo do Card */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <div className="flex">
                             {[1, 2, 3, 4, 5].map((s) => (
                               <Star
@@ -427,64 +511,164 @@ export default function AdminDashboard({
                               />
                             ))}
                           </div>
-                          <span className="text-xs font-semibold text-slate-500">
+                          <span className="text-xs font-bold text-slate-700">
                             {f.rating} de 5 estrelas
                           </span>
-                          <span
-                            className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                              f.status === "resolved"
-                                ? "bg-emerald-50 text-emerald-700"
-                                : f.status === "contacted"
-                                ? "bg-blue-50 text-blue-700"
-                                : "bg-amber-50 text-amber-800"
-                            }`}
-                          >
-                            {f.status === "resolved"
-                              ? "Resolvido"
-                              : f.status === "contacted"
-                              ? "Em Contato"
-                              : "Pendente"}
+                          <span className="text-slate-300">•</span>
+                          <span className="text-xs text-slate-400 font-mono">
+                            {new Date(f.createdAt).toLocaleDateString("pt-BR", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </span>
                         </div>
 
-                        <div className="text-slate-800 text-sm font-semibold">
-                          {f.customerName || "Cliente anônimo"}{" "}
-                          {f.customerPhone && (
-                            <span className="font-normal text-slate-500 text-xs">
-                              • {f.customerPhone}
+                        {/* Status Select */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-400 font-medium hidden sm:inline">Status do Caso:</span>
+                          <select
+                            value={f.status || "pending"}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              if (newStatus === "resolved" && !f.resolutionNotes) {
+                                setEditingResolutionId(f.id);
+                                setResolutionNotesInput("");
+                              }
+                              handleUpdateStatus(f.id, newStatus);
+                            }}
+                            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold focus:outline-none transition-colors cursor-pointer ${
+                              f.status === "resolved"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : f.status === "contacted"
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : "bg-amber-50 text-amber-800 border-amber-200"
+                            }`}
+                          >
+                            <option value="pending">⏳ Pendente</option>
+                            <option value="contacted">📞 Em Contato</option>
+                            <option value="resolved">✓ Resolvido</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Informações do Cliente */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="text-sm font-bold text-slate-900 flex flex-wrap items-center gap-2">
+                          <span>{f.customerName || "Cliente anônimo"}</span>
+                          {hasPhone ? (
+                            <span className="font-mono text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/60 flex items-center gap-1 font-semibold">
+                              <Phone className="w-3 h-3 text-emerald-600" />
+                              {f.customerPhone}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-400 italic font-normal bg-slate-100 px-2.5 py-0.5 rounded-md">
+                              Telefone não informado (avaliação anônima)
                             </span>
                           )}
                         </div>
-
-                        <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
-                          "{f.comment || "Nenhum relato detalhado deixado pelo cliente."}"
-                        </p>
                       </div>
 
-                      {/* Botões de Ação */}
-                      <div className="flex sm:flex-col justify-end gap-2 shrink-0">
-                        {whatsappContactUrl && (
-                          <a
-                            href={whatsappContactUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>Chamar no Zap</span>
-                          </a>
+                      {/* Relato do Cliente */}
+                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/70 text-slate-700 text-sm leading-relaxed">
+                        &quot;{f.comment || "Nenhum comentário por escrito deixado pelo cliente."}&quot;
+                      </div>
+
+                      {/* Ações Inteligentes: Apoio ao Dono */}
+                      <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        {hasPhone ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <a
+                              href={quickGreetUrl || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>Chamar no Zap</span>
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFeedbackForScripts(f)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition-all cursor-pointer"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                              <span>Guia & Scripts de Reversão para 5⭐</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-start gap-2.5 bg-amber-50/70 border border-amber-200/60 p-3 rounded-xl text-xs text-amber-900 flex-1">
+                            <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="block font-semibold">Como agir neste caso (Sem telefone):</strong>
+                              <span>
+                                Como o cliente optou por não informar contato, use este relato para alinhar com sua equipe sobre o ponto citado e prevenir que novos clientes sintam a mesma insatisfação.
+                              </span>
+                            </div>
+                          </div>
                         )}
 
-                        <select
-                          value={f.status || "pending"}
-                          onChange={(e) => handleUpdateStatus(f.id, e.target.value)}
-                          className="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white font-medium focus:outline-none"
-                        >
-                          <option value="pending">Marcar: Pendente</option>
-                          <option value="contacted">Marcar: Em Contato</option>
-                          <option value="resolved">Marcar: Resolvido</option>
-                        </select>
+                        {/* Botão de Registro de Resolução */}
+                        <div className="shrink-0 flex items-center justify-end">
+                          {editingResolutionId !== f.id && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingResolutionId(f.id);
+                                setResolutionNotesInput(f.resolutionNotes || "");
+                              }}
+                              className="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-blue-600" />
+                              {f.resolutionNotes ? "Editar Resolução" : "+ Anotar como foi resolvido"}
+                            </button>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Caixa de Anotação de Resolução */}
+                      {editingResolutionId === f.id ? (
+                        <div className="mt-2 bg-blue-50/70 border border-blue-200 p-3.5 rounded-xl space-y-2">
+                          <label className="block text-xs font-bold text-blue-900">
+                            Como este caso foi resolvido internamente?
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={resolutionNotesInput}
+                            onChange={(e) => setResolutionNotesInput(e.target.value)}
+                            placeholder="Ex: Conversei com o cliente no WhatsApp, esclarecemos o mal-entendido, oferecemos uma cortesia na próxima visita e ele saiu satisfeito."
+                            className="w-full bg-white border border-blue-200 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
+                          />
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditingResolutionId(null)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-200/50 cursor-pointer"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              disabled={savingResolution}
+                              onClick={() => handleSaveResolution(f.id)}
+                              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-sm cursor-pointer disabled:opacity-50"
+                            >
+                              {savingResolution ? "Salvando..." : "Salvar Resolução"}
+                            </button>
+                          </div>
+                        </div>
+                      ) : f.resolutionNotes ? (
+                        <div className="mt-2 bg-emerald-50/80 border border-emerald-200/80 p-3 rounded-xl flex items-start gap-2.5 text-xs text-emerald-900">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <span className="font-bold block text-emerald-950">Histórico de Resolução:</span>
+                            <span className="text-emerald-800">{f.resolutionNotes}</span>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -726,6 +910,162 @@ export default function AdminDashboard({
           </div>
         )}
       </main>
+
+      {/* Modal de Guia & Scripts de Reversão para 5 Estrelas */}
+      {selectedFeedbackForScripts && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setSelectedFeedbackForScripts(null)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">
+                  Guia & Scripts de Reversão para 5⭐
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Como transformar a insatisfação de {selectedFeedbackForScripts.customerName || "este cliente"} em uma avaliação 5 estrelas no Google.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-slate-800">
+              {/* Script 1 */}
+              <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded-full">
+                    Passo 1: Acolhimento & Desculpas Sinceras
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const text = `Olá, ${selectedFeedbackForScripts.customerName || ""}! Tudo bem?\n\nAqui é o responsável pelo atendimento da ${currentBusiness.name}. Recebi a sua mensagem no nosso canal de ouvidoria e fiz questão de entrar em contato pessoalmente.\n\nSentimos muito que sua experiência não tenha sido 100% satisfatória. Valorizamos muito sua opinião e gostaríamos de entender exatamente o que houve para podermos corrigir para você agora.`;
+                        navigator.clipboard.writeText(text);
+                        setCopiedScriptIndex(1);
+                        setTimeout(() => setCopiedScriptIndex(null), 2000);
+                      }}
+                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedScriptIndex === 1 ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedScriptIndex === 1 ? "Copiado!" : "Copiar"}
+                    </button>
+                    {selectedFeedbackForScripts.customerPhone && (
+                      <a
+                        href={`https://wa.me/55${selectedFeedbackForScripts.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `Olá, ${selectedFeedbackForScripts.customerName || ""}! Tudo bem?\n\nAqui é o responsável pelo atendimento da ${currentBusiness.name}. Recebi a sua mensagem no nosso canal de ouvidoria e fiz questão de entrar em contato pessoalmente.\n\nSentimos muito que sua experiência não tenha sido 100% satisfatória. Valorizamos muito sua opinião e gostaríamos de entender exatamente o que houve para podermos corrigir para você agora.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1 shadow-sm"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        Disparar no Zap
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 whitespace-pre-wrap font-sans bg-white p-3 rounded-xl border border-slate-200">
+                  {`Olá, ${selectedFeedbackForScripts.customerName || ""}! Tudo bem?\n\nAqui é o responsável pelo atendimento da ${currentBusiness.name}. Recebi a sua mensagem no nosso canal de ouvidoria e fiz questão de entrar em contato pessoalmente.\n\nSentimos muito que sua experiência não tenha sido 100% satisfatória. Valorizamos muito sua opinião e gostaríamos de entender exatamente o que houve para podermos corrigir para você agora.`}
+                </p>
+              </div>
+
+              {/* Script 2 */}
+              <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full">
+                    Passo 2: Compensação & Encantamento
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const text = `${selectedFeedbackForScripts.customerName || "Olá"}, compreendemos perfeitamente o seu ponto e já alinhamos com a equipe para que isso não se repita.\n\nComo forma de nos desculparmos pelo transtorno, gostaríamos de oferecer a você [uma cortesia especial / um desconto de X%] em sua próxima visita, com atendimento prioritário. Seria um prazer receber você novamente para demonstrar o nosso verdadeiro padrão!`;
+                        navigator.clipboard.writeText(text);
+                        setCopiedScriptIndex(2);
+                        setTimeout(() => setCopiedScriptIndex(null), 2000);
+                      }}
+                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedScriptIndex === 2 ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedScriptIndex === 2 ? "Copiado!" : "Copiar"}
+                    </button>
+                    {selectedFeedbackForScripts.customerPhone && (
+                      <a
+                        href={`https://wa.me/55${selectedFeedbackForScripts.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `${selectedFeedbackForScripts.customerName || "Olá"}, compreendemos perfeitamente o seu ponto e já alinhamos com a equipe para que isso não se repita.\n\nComo forma de nos desculparmos pelo transtorno, gostaríamos de oferecer a você [uma cortesia especial / um desconto de X%] em sua próxima visita, com atendimento prioritário. Seria um prazer receber você novamente para demonstrar o nosso verdadeiro padrão!`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1 shadow-sm"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        Disparar no Zap
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 whitespace-pre-wrap font-sans bg-white p-3 rounded-xl border border-slate-200">
+                  {`${selectedFeedbackForScripts.customerName || "Olá"}, compreendemos perfeitamente o seu ponto e já alinhamos com a equipe para que isso não se repita.\n\nComo forma de nos desculparmos pelo transtorno, gostaríamos de oferecer a você [uma cortesia especial / um desconto de X%] em sua próxima visita, com atendimento prioritário. Seria um prazer receber você novamente para demonstrar o nosso verdadeiro padrão!`}
+                </p>
+              </div>
+
+              {/* Script 3 */}
+              <div className="border border-emerald-200 rounded-2xl p-4 bg-emerald-50/50 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                    Passo 3: A Mágica da Reversão para 5⭐ no Google
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const text = `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`;
+                        navigator.clipboard.writeText(text);
+                        setCopiedScriptIndex(3);
+                        setTimeout(() => setCopiedScriptIndex(null), 2000);
+                      }}
+                      className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedScriptIndex === 3 ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedScriptIndex === 3 ? "Copiado!" : "Copiar"}
+                    </button>
+                    {selectedFeedbackForScripts.customerPhone && (
+                      <a
+                        href={`https://wa.me/55${selectedFeedbackForScripts.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                          `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1 shadow-sm"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        Disparar no Zap
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 whitespace-pre-wrap font-sans bg-white p-3 rounded-xl border border-emerald-200">
+                  {`${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedFeedbackForScripts(null)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                Fechar Guia
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

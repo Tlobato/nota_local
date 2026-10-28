@@ -259,15 +259,25 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
 
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Seu WhatsApp ou Telefone (Opcional)
+                  Seu WhatsApp (para retorno e solução)
                 </label>
                 <input
                   type="tel"
-                  placeholder="Ex: (15) 99999-9999"
+                  placeholder="(15) 99999-9999"
                   value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, "").slice(0, 11);
+                    let masked = digits;
+                    if (digits.length > 2 && digits.length <= 6) masked = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+                    else if (digits.length > 6 && digits.length <= 10) masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+                    else if (digits.length > 10) masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+                    setCustomerPhone(masked);
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono"
                 />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Opcional: deixe seu número se desejar uma resposta direta da equipe ou uma compensação pelo ocorrido.
+                </p>
               </div>
 
               <div>

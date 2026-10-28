@@ -9,15 +9,25 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { status } = await req.json();
+    const { status, resolutionNotes } = await req.json();
 
     if (!["pending", "contacted", "resolved"].includes(status)) {
       return NextResponse.json({ error: "Status inválido" }, { status: 400 });
     }
 
+    const updatePayload: Record<string, any> = { status };
+    if (resolutionNotes !== undefined) {
+      updatePayload.resolutionNotes = resolutionNotes;
+    }
+    if (status === "resolved") {
+      updatePayload.resolvedAt = new Date();
+    } else {
+      updatePayload.resolvedAt = null;
+    }
+
     const [updated] = await db
       .update(feedbacks)
-      .set({ status })
+      .set(updatePayload)
       .where(eq(feedbacks.id, id))
       .returning();
 
