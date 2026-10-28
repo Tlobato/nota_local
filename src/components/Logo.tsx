@@ -16,7 +16,7 @@ export default function Logo({
 
   const content = (
     <div className="flex items-center gap-2.5 group">
-      {/* Ícone: Pin de Localização do Google Maps com Estrela Dourada dentro */}
+      {/* Ícone: Pin de Localização do Google com Estrela Dourada dentro */}
       <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center shadow-md shadow-blue-500/25 border border-white/10 shrink-0 transition-transform group-hover:scale-105 duration-200">
         <svg
           viewBox="0 0 24 24"

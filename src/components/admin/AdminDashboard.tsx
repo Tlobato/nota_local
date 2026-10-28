@@ -783,7 +783,7 @@ export default function AdminDashboard({
                   Sua empresa já evitou {retainedCritiques} nota(s) negativa(s) pública(s)!
                 </h3>
                 <p className="text-sm text-slate-300 mt-1 max-w-xl">
-                  Cada crítica retida internamente poupou seu negócio de perder posições nas pesquisas do Google Maps e preservou pacientes/clientes que pesquisam antes de fechar negócio.
+                  Cada crítica retida internamente poupou seu negócio de perder posições nas pesquisas do Google e preservou pacientes/clientes que pesquisam antes de fechar negócio.
                 </p>
               </div>
               <button
@@ -821,7 +821,7 @@ export default function AdminDashboard({
                           {f.customerName || "Cliente anônimo"}
                         </p>
                         <p className="text-xs text-slate-500 truncate max-w-md">
-                          {f.comment || (f.redirectedToGoogle ? "Avaliação 5 estrelas enviada ao Google Maps" : "Sem comentário escrito")}
+                          {f.comment || (f.redirectedToGoogle ? "Avaliação 5 estrelas enviada ao Google" : "Sem comentário escrito")}
                         </p>
                       </div>
                     </div>
@@ -852,7 +852,7 @@ export default function AdminDashboard({
                   Críticas Retidas (Ouvidoria Privada)
                 </h2>
                 <p className="text-sm text-slate-500 mt-1">
-                  Feedbacks de 1 a 3 estrelas que foram bloqueados do Google Maps para que você possa resolver antes de virar queixa pública.
+                  Feedbacks de 1 a 3 estrelas retidos antes de irem a público no Google para que você possa resolver internamente.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200/80 px-3 py-1.5 rounded-full shadow-xs shrink-0 self-start sm:self-auto">
@@ -1138,7 +1138,7 @@ export default function AdminDashboard({
                     {feedbackFilter === "pending"
                       ? "Excelente trabalho! Todas as queixas retidas foram solucionadas ou estão em atendimento."
                       : feedbackFilter === "all"
-                      ? "Todas as avaliações recentes foram positivas e direcionadas diretamente ao Google Maps."
+                      ? "Todas as avaliações recentes foram positivas e direcionadas diretamente ao Google."
                       : "Selecione outro filtro acima para visualizar o histórico de avaliações."}
                   </p>
                 </div>
@@ -1517,7 +1517,7 @@ export default function AdminDashboard({
                 Configurações da Empresa
               </h2>
               <p className="text-sm text-slate-500 mt-1">
-                Altere o link oficial de avaliação do Google Maps, número de alerta e identidade visual.
+                Altere o link oficial de avaliação do Google, número de alerta e identidade visual.
               </p>
             </div>
 
@@ -1556,7 +1556,7 @@ export default function AdminDashboard({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Link Direto de Avaliação no Google Maps
+                  Link Direto de Avaliação no Google
                 </label>
                 <input
                   type="url"
@@ -1723,7 +1723,7 @@ export default function AdminDashboard({
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        const text = `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`;
+                        const text = `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`;
                         navigator.clipboard.writeText(text);
                         setCopiedScriptIndex(3);
                         setTimeout(() => setCopiedScriptIndex(null), 2000);
@@ -1736,7 +1736,7 @@ export default function AdminDashboard({
                     {selectedFeedbackForScripts.customerPhone && (
                       <a
                         href={`https://wa.me/55${selectedFeedbackForScripts.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                          `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`
+                          `${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1749,7 +1749,7 @@ export default function AdminDashboard({
                   </div>
                 </div>
                 <p className="text-xs text-slate-600 whitespace-pre-wrap font-sans bg-white p-3 rounded-xl border border-emerald-200">
-                  {`${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google Maps é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`}
+                  {`${selectedFeedbackForScripts.customerName || "Olá"}, ficamos muito felizes que conseguimos resolver tudo e deixar você satisfeito(a)!\n\nA reputação da nossa empresa no Google é muito valiosa para nós. Você nos daria uma grande força deixando uma avaliação sincera de 5 estrelas sobre como cuidamos de você e resolvemos a situação?\n\nLeva menos de 10 segundos por este link direto:\n${currentBusiness.googleReviewUrl}\n\nMuito obrigado pela confiança e carinho! ⭐⭐⭐⭐⭐`}
                 </p>
               </div>
             </div>

@@ -202,7 +202,7 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
 
             <h3 className="text-xl font-bold text-slate-900 mb-2">Muito obrigado pelo carinho!</h3>
             <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-              Sua avaliação no Google Maps faz uma diferença enorme para nossa equipe e ajuda outras pessoas a encontrarem a{" "}
+              Sua avaliação no Google faz uma diferença enorme para nossa equipe e ajuda outras pessoas a encontrarem a{" "}
               <strong className="text-slate-800">{business.name}</strong>.
             </p>
 
@@ -213,7 +213,7 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
               rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-base shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
             >
-              <span>Avaliar no Google Maps</span>
+              <span>Avaliar no Google</span>
               <ExternalLink className="w-4 h-4" />
             </a>
 

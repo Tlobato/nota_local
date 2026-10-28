@@ -151,11 +151,11 @@ export default function OnboardingPage() {
               />
             </div>
 
-            {/* Link Oficial de Review do Google Maps */}
+            {/* Link Oficial de Review do Google */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Link de Avaliação do Google Maps
+                  Link de Avaliação do Google
                 </label>
                 <a
                   href="https://support.google.com/business/answer/3474122?hl=pt-BR"

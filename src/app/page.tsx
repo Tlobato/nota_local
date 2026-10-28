@@ -81,14 +81,14 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
-            Proteja sua nota no Google Maps e{" "}
+            Proteja sua nota no Google e{" "}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">
               multiplique avaliações 5 estrelas.
             </span>
           </h1>
 
           <p className="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
-            O filtro inteligente que direciona clientes satisfeitos direto para o seu Google Meu Negócio e retém críticas internamente antes que virem queixas públicas.
+            O filtro inteligente que direciona clientes satisfeitos direto para o seu perfil no Google e retém críticas internamente antes que virem queixas públicas.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -162,7 +162,7 @@ export default function LandingPage() {
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h4 className="text-base font-bold text-emerald-700">
-                  {demoRating} Estrelas: Direcionado ao Google Maps!
+                  {demoRating} Estrelas: Direcionado ao Google!
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   O cliente feliz recebe os parabéns e é redirecionado em 2 segundos para o link oficial de review da sua empresa no Google, aumentando suas 5 estrelas públicas!
@@ -204,7 +204,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-              A matemática implacável do Google Maps
+              A matemática implacável do Google
             </h2>
             <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-xl mx-auto">
               Empresas locais perdem centenas de milhares de reais em faturamento simplesmente por não controlarem a reputação online.
@@ -228,7 +228,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Ranqueamento Local</h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                O algoritmo do Google Maps prioriza estabelecimentos com alto volume de avaliações recentes. Quem tem mais reviews aparece no topo das buscas sem pagar anúncios.
+                O algoritmo do Google prioriza estabelecimentos com alto volume de avaliações recentes. Quem tem mais reviews aparece no topo das buscas sem pagar anúncios.
               </p>
             </div>
 

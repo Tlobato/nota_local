@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NotaLocal | Blindagem e Reputação no Google Meu Negócio",
-  description: "Multiplique avaliações 5 estrelas no Google Maps e retenha críticas internamente com inteligência.",
+  title: "NotaLocal | Blindagem e Reputação no Google",
+  description: "Multiplique avaliações 5 estrelas no Google e retenha críticas internamente com inteligência.",
   icons: {
     icon: "/favicon.ico",
   },

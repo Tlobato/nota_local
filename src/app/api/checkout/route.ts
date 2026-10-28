@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const payment = await createAsaasPayment({
       customerId: customer.id,
       value: 490.0,
-      description: "NotaLocal - Setup & Blindagem de Reputação no Google Maps",
+      description: "NotaLocal - Setup & Blindagem de Reputação no Google",
       dueDate: dueDateString,
       maxInstallmentCount: 12,
     });
