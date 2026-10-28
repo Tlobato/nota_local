@@ -66,12 +66,43 @@ export async function createAsaasPayment(input: CreatePaymentInput) {
       value: input.value,
       dueDate: input.dueDate,
       description: input.description,
-      maxInstallmentCount: input.maxInstallmentCount || 12,
+      maxInstallmentCount: input.maxInstallmentCount ?? 12,
     }),
   });
 }
 
-// 3. Obter QR Code Pix de uma cobrança
+// 3. Criar Assinatura Recorrente Mensal e retornar o link da primeira fatura
+export async function createAsaasSubscription(input: {
+  customerId: string;
+  value: number;
+  description: string;
+  nextDueDate: string;
+}) {
+  const subscription = await asaasRequest("/subscriptions", {
+    method: "POST",
+    body: JSON.stringify({
+      customer: input.customerId,
+      billingType: "UNDEFINED",
+      value: input.value,
+      nextDueDate: input.nextDueDate,
+      cycle: "MONTHLY",
+      description: input.description,
+    }),
+  });
+
+  // Busca a primeira cobrança gerada pela assinatura para redirecionar o cliente à fatura
+  const payments = await asaasRequest(`/subscriptions/${subscription.id}/payments`, {
+    method: "GET",
+  });
+
+  const firstPayment = payments?.data?.[0];
+  return {
+    id: subscription.id,
+    invoiceUrl: firstPayment?.invoiceUrl || firstPayment?.bankSlipUrl,
+  };
+}
+
+// 4. Obter QR Code Pix de uma cobrança
 export async function getAsaasPixQrCode(paymentId: string) {
   return asaasRequest(`/payments/${paymentId}/pixQrCode`, {
     method: "GET",

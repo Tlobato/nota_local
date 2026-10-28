@@ -139,13 +139,13 @@ export default function LandingPage() {
                   <ArrowRight className="w-4 h-4" />
                 </a>
 
-                <Link
-                  href="/checkout"
+                <a
+                  href="#planos"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Ativar Meu Negócio (R$ 490)</span>
+                  <span>Ativar por R$ 29,90/mês</span>
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                </Link>
+                </a>
               </>
             )}
           </div>
@@ -286,6 +286,133 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Seção de Planos (Ancoragem Mensal vs Anual) */}
+      {!(isLoaded && isSignedIn) && (
+        <section id="planos" className="py-20 px-4 sm:px-6 bg-slate-950/80 border-t border-slate-800">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14 space-y-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                Menos de R$ 0,99 por dia
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+                Quanto vale impedir 1 crítica injusta no seu Google?
+              </h2>
+              <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
+                Um único cliente salvo ou uma única venda nova vinda do Google já paga um ano inteiro de assinatura. Escolha o plano ideal para o seu negócio:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+              {/* Plano Mensal */}
+              <div className="bg-slate-900/90 p-7 sm:p-8 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="space-y-5">
+                  <div>
+                    <span className="inline-block px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-bold mb-3">
+                      Sem Fidelidade
+                    </span>
+                    <h3 className="text-xl font-bold text-white">Plano Mensal</h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Ideal para quem deseja testar mês a mês sem compromisso anual.
+                    </p>
+                  </div>
+
+                  <div className="py-4 border-y border-slate-800">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 49,90</span>
+                      <span className="text-xs text-slate-400">/ mês</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Cobrança mensal via Pix ou Cartão • Cancele quando quiser
+                    </p>
+                  </div>
+
+                  <ul className="space-y-3">
+                    {[
+                      "Página exclusiva personalizada com as cores da sua loja",
+                      "Filtro inteligente (4-5⭐ Google / 1-3⭐ Ouvidoria Privada)",
+                      "Alerta instantâneo no seu WhatsApp em caso de crítica",
+                      "Gerador de Plaquinha Oficial de Balcão para impressão",
+                      "Disparador rápido de convites por WhatsApp",
+                    ].map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300">
+                        <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-8">
+                  <Link
+                    href="/checkout?plan=monthly"
+                    className="w-full py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Começar no Plano Mensal</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Plano Anual (Destaque) */}
+              <div className="relative bg-gradient-to-b from-blue-950/80 via-slate-900 to-slate-900 p-7 sm:p-8 rounded-3xl border-2 border-blue-500 shadow-2xl shadow-blue-600/20 flex flex-col justify-between">
+                <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-[11px] font-extrabold uppercase tracking-wider shadow-lg">
+                  Mais Escolhido • 40% OFF
+                </div>
+
+                <div className="space-y-5">
+                  <div>
+                    <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold mb-3">
+                      Blindagem Anual Completa
+                    </span>
+                    <h3 className="text-xl font-bold text-white">Plano Anual</h3>
+                    <p className="text-xs text-slate-300 mt-1">
+                      Economize 40% e garanta 12 meses de proteção contínua para o QR Code do seu balcão.
+                    </p>
+                  </div>
+
+                  <div className="py-4 border-y border-slate-800/80">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-sm font-bold text-blue-300">12x de</span>
+                      <span className="text-4xl sm:text-5xl font-extrabold text-white">R$ 29,90</span>
+                      <span className="text-xs text-slate-400">no cartão</span>
+                    </div>
+                    <p className="text-xs text-emerald-400 font-semibold mt-1.5">
+                      ou <strong>R$ 297,00 à vista no Pix</strong> (equivale a R$ 0,99 por dia)
+                    </p>
+                  </div>
+
+                  <ul className="space-y-3">
+                    {[
+                      "Tudo do Plano Mensal com 40% de desconto garantido",
+                      "QR Code fixo garantido por 12 meses sem risco de interrupção",
+                      "Plaquinha de Acrílico/Balcão em alta definição (300 DPI)",
+                      "Painel de Ouvidoria com histórico de resolução de casos",
+                      "Garantia incondicional de 7 dias ou seu dinheiro de volta",
+                    ].map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-8">
+                  <Link
+                    href="/checkout?plan=annual"
+                    className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Ativar Plano Anual (12x R$ 29,90)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CTA Final */}
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-900 to-slate-950 text-center border-t border-slate-800">
         <div className="max-w-2xl mx-auto space-y-6">
@@ -323,11 +450,11 @@ export default function LandingPage() {
                 Pronto para blindar a nota do seu negócio?
               </h2>
               <p className="text-sm text-slate-400">
-                Comece a multiplicar avaliações 5 estrelas hoje mesmo por apenas R$ 490 (em até 12x no cartão ou Pix).
+                Comece a multiplicar avaliações 5 estrelas hoje mesmo por menos de R$ 0,99 por dia (12x de R$ 29,90 no plano anual ou R$ 49,90/mês sem fidelidade).
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <Link
-                  href="/checkout"
+                  href="/checkout?plan=annual"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25"
                 >
                   Ativar Meu Estabelecimento

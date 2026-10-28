@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAsaasCustomer, createAsaasPayment } from "@/lib/asaas";
+import {
+  createAsaasCustomer,
+  createAsaasPayment,
+  createAsaasSubscription,
+} from "@/lib/asaas";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, cpfCnpj, phone } = body;
+    const { name, email, cpfCnpj, phone, plan = "annual" } = body;
 
     if (!name || !email || !cpfCnpj) {
       return NextResponse.json(
@@ -36,11 +40,26 @@ export async function POST(req: NextRequest) {
     dueDate.setDate(dueDate.getDate() + 2);
     const dueDateString = dueDate.toISOString().split("T")[0];
 
-    // 3. Gerar Cobrança de R$ 490,00 com opção de até 12x no cartão ou Pix
+    // 3. Gerar Cobrança conforme o plano escolhido (Anual R$ 297 em até 12x ou Mensal R$ 49,90/mês)
+    if (plan === "monthly") {
+      const subscription = await createAsaasSubscription({
+        customerId: customer.id,
+        value: 49.9,
+        description: "NotaLocal - Plano Mensal (Blindagem de Reputação no Google)",
+        nextDueDate: dueDateString,
+      });
+
+      return NextResponse.json({
+        success: true,
+        paymentId: subscription.id,
+        paymentUrl: subscription.invoiceUrl,
+      });
+    }
+
     const payment = await createAsaasPayment({
       customerId: customer.id,
-      value: 490.0,
-      description: "NotaLocal - Setup & Blindagem de Reputação no Google",
+      value: 297.0,
+      description: "NotaLocal - Plano Anual (12 Meses de Blindagem de Reputação no Google)",
       dueDate: dueDateString,
       maxInstallmentCount: 12,
     });

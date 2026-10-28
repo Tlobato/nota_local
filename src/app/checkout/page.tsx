@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "@/components/Logo";
 import {
   ShieldCheck,
@@ -9,11 +9,38 @@ import {
   CreditCard,
   QrCode,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
+
+const formatPhoneMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length <= 2) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10)
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
+const formatCpfCnpjMask = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 14);
+  if (digits.length <= 11) {
+    return digits
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  }
+  return digits
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d)/, "$1-$2");
+};
 
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [plan, setPlan] = useState<"annual" | "monthly">("annual");
 
   const [form, setForm] = useState({
     name: "",
@@ -21,6 +48,17 @@ export default function CheckoutPage() {
     cpfCnpj: "",
     phone: "",
   });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("plan") === "monthly") {
+        setPlan("monthly");
+      } else if (params.get("plan") === "annual") {
+        setPlan("annual");
+      }
+    }
+  }, []);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +69,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, plan }),
       });
 
       const data = await res.json();
@@ -64,37 +102,124 @@ export default function CheckoutPage() {
         </p>
       </div>
 
+      {/* Seletor de Plano Rápido no Topo */}
+      <div className="sm:mx-auto sm:w-full sm:max-w-4xl mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-800/60 p-2 rounded-2xl border border-slate-700/80">
+          <button
+            type="button"
+            onClick={() => setPlan("annual")}
+            className={`relative p-4 rounded-xl text-left transition-all cursor-pointer border ${
+              plan === "annual"
+                ? "bg-blue-600/20 border-blue-500 shadow-lg shadow-blue-600/10"
+                : "bg-slate-900/40 border-transparent hover:border-slate-700"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                Plano Anual
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                  40% OFF • Recomendado
+                </span>
+              </span>
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  plan === "annual" ? "border-blue-400 bg-blue-500" : "border-slate-600"
+                }`}
+              >
+                {plan === "annual" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              </div>
+            </div>
+            <p className="text-xs text-slate-300 font-semibold">
+              12x de <strong className="text-white text-sm">R$ 29,90</strong>{" "}
+              <span className="text-slate-400 font-normal">(ou R$ 297 à vista no Pix)</span>
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPlan("monthly")}
+            className={`relative p-4 rounded-xl text-left transition-all cursor-pointer border ${
+              plan === "monthly"
+                ? "bg-blue-600/20 border-blue-500 shadow-lg shadow-blue-600/10"
+                : "bg-slate-900/40 border-transparent hover:border-slate-700"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                Plano Mensal
+                <span className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[10px] font-semibold">
+                  Sem fidelidade
+                </span>
+              </span>
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  plan === "monthly" ? "border-blue-400 bg-blue-500" : "border-slate-600"
+                }`}
+              >
+                {plan === "monthly" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              </div>
+            </div>
+            <p className="text-xs text-slate-300 font-semibold">
+              <strong className="text-white text-sm">R$ 49,90</strong> / mês{" "}
+              <span className="text-slate-400 font-normal">(renovação mensal)</span>
+            </p>
+          </button>
+        </div>
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         {/* Coluna 1: Resumo do Pacote / Valor */}
         <div className="md:col-span-5 bg-slate-800/80 p-6 sm:p-8 rounded-3xl border border-slate-700/80 shadow-xl space-y-6">
           <div>
-            <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-400/30 mb-3">
-              Licença Vitalícia + Setup
-            </span>
-            <h3 className="text-xl font-bold text-white">Plano Blindagem Total</h3>
+            {plan === "annual" ? (
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
+                Mais Escolhido • Economize 40%
+              </span>
+            ) : (
+              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold border border-blue-400/30 mb-3">
+                Assinatura Mensal Flexível
+              </span>
+            )}
+            <h3 className="text-xl font-bold text-white">
+              {plan === "annual" ? "Plano Anual Blindagem Total" : "Plano Mensal Blindagem Total"}
+            </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Tudo pronto para multiplicar avaliações 5 estrelas e reter críticas.
+              Tudo pronto para multiplicar avaliações 5 estrelas no Google e reter críticas em privado.
             </p>
           </div>
 
-          <div className="py-4 border-y border-slate-700/80 space-y-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 490</span>
-              <span className="text-xs text-slate-400">à vista no Pix</span>
+          {plan === "annual" ? (
+            <div className="py-4 border-y border-slate-700/80 space-y-2">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-sm font-bold text-slate-400">12x de</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 29,90</span>
+                <span className="text-xs text-slate-400">no cartão</span>
+              </div>
+              <p className="text-xs text-emerald-400 font-semibold">
+                ou <strong>R$ 297,00 à vista no Pix</strong> (menos de R$ 0,99 por dia)
+              </p>
             </div>
-            <p className="text-xs text-emerald-400 font-semibold">
-              ou em até <strong>12x de R$ 48,90</strong> no cartão de crédito
-            </p>
-          </div>
+          ) : (
+            <div className="py-4 border-y border-slate-700/80 space-y-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 49,90</span>
+                <span className="text-xs text-slate-400">/ mês</span>
+              </div>
+              <p className="text-xs text-slate-300 font-medium">
+                Sem fidelidade • Cancele quando quiser
+              </p>
+            </div>
+          )}
 
           <div className="space-y-3">
             {[
-              "Página exclusiva com o logo e cores da sua empresa",
-              "Painel de Gestão em tempo real",
+              "Página exclusiva personalizada com as cores da sua empresa",
+              "Painel de Gestão e métricas em tempo real",
               "Filtro inteligente (4-5⭐ Google / 1-3⭐ Ouvidoria)",
               "Alerta instantâneo no WhatsApp do responsável",
-              "Gerador de QR Code de balcão em alta resolução",
-              "Disparador de 1-clique para WhatsApp da recepção",
+              "Gerador de Plaquinha Oficial de Balcão & QR Code em alta resolução",
+              "Convite direto de 1-clique via WhatsApp para seus clientes",
               "Comprovante e fatura formal para contabilidade",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5 text-xs text-slate-300">
@@ -114,7 +239,7 @@ export default function CheckoutPage() {
         <div className="md:col-span-7 bg-white text-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-100">
           <h3 className="text-lg font-bold text-slate-900 mb-1">Dados de Faturamento</h3>
           <p className="text-xs text-slate-500 mb-6">
-            Preencha seus dados para emissão da cobrança e ativação do painel.
+            Preencha seus dados para emissão da cobrança e ativação imediata do painel.
           </p>
 
           {error && (
@@ -162,7 +287,9 @@ export default function CheckoutPage() {
                   required
                   placeholder="000.000.000-00"
                   value={form.cpfCnpj}
-                  onChange={(e) => setForm({ ...form, cpfCnpj: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, cpfCnpj: formatCpfCnpjMask(e.target.value) })
+                  }
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
                 />
               </div>
@@ -175,7 +302,9 @@ export default function CheckoutPage() {
                   type="tel"
                   placeholder="(11) 99999-9999"
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, phone: formatPhoneMask(e.target.value) })
+                  }
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
                 />
               </div>
@@ -192,7 +321,11 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5" />
-                    <span>Continuar para Pagamento Asaas (Pix ou Cartão)</span>
+                    <span>
+                      {plan === "annual"
+                        ? "Continuar no Plano Anual (12x R$ 29,90 ou Pix)"
+                        : "Continuar no Plano Mensal (R$ 49,90/mês)"}
+                    </span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </>
                 )}
