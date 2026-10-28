@@ -216,7 +216,7 @@ export default function OnboardingPage() {
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                Você receberá um alerta imediato caso algum cliente deixe nota de 1 a 3 estrelas.
+                Número de contato do responsável. Os alertas de críticas retidas são enviados para o seu e-mail de cadastro e exibidos na Ouvidoria.
               </p>
             </div>
 

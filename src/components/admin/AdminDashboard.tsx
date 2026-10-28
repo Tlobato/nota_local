@@ -1216,10 +1216,10 @@ export default function AdminDashboard({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
                   <div>
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-200/60 inline-block mb-1">
-                      Display de Balcão & Mesa
+                      Arte para Display de Balcão & Mesa
                     </span>
                     <h3 className="text-lg font-bold text-slate-900">
-                      Placa Oficial para Impressão
+                      Arte Oficial para Impressão
                     </h3>
                   </div>
                   <button
@@ -1361,7 +1361,7 @@ export default function AdminDashboard({
                       className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                     >
                       <Printer className="w-4 h-4" />
-                      <span>Imprimir Placa (A5/Mesa)</span>
+                      <span>Imprimir Arte (A5/Mesa)</span>
                     </button>
 
                     <button
@@ -1371,7 +1371,7 @@ export default function AdminDashboard({
                       className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50"
                     >
                       <Download className="w-4 h-4" />
-                      <span>{downloadingPlate ? "Gerando..." : "Baixar Placa Completa (PNG)"}</span>
+                      <span>{downloadingPlate ? "Gerando..." : "Baixar Arte Completa (PNG)"}</span>
                     </button>
                   </div>
 
@@ -1568,7 +1568,7 @@ export default function AdminDashboard({
                 Configurações da Empresa
               </h2>
               <p className="text-sm text-slate-500 mt-1">
-                Altere o link oficial de avaliação do Google, número de alerta e identidade visual.
+                Altere o link oficial de avaliação do Google, dados de contato e identidade visual.
               </p>
             </div>
 
@@ -1624,7 +1624,7 @@ export default function AdminDashboard({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  WhatsApp para Alertas Imediatos (Gerente / Dono)
+                  WhatsApp do Responsável / Gerente
                 </label>
                 <input
                   type="tel"
@@ -1639,7 +1639,7 @@ export default function AdminDashboard({
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Número que receberá a notificação caso algum cliente deixe uma avaliação de 1 a 3 estrelas.
+                  Número de contato principal do gestor do estabelecimento. As notificações de novas críticas são enviadas para o seu e-mail de acesso e registradas na Ouvidoria.
                 </p>
               </div>
 

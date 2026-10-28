@@ -214,12 +214,12 @@ export default function CheckoutPage() {
 
           <div className="space-y-3">
             {[
-              "Página exclusiva personalizada com as cores da sua empresa",
+              "Página exclusiva personalizada com o nome e cores da sua empresa",
               "Painel de Gestão e métricas em tempo real",
-              "Filtro inteligente (4-5⭐ Google / 1-3⭐ Ouvidoria)",
-              "Alerta instantâneo no WhatsApp do responsável",
-              "Gerador de Plaquinha Oficial de Balcão & QR Code em alta resolução",
-              "Convite direto de 1-clique via WhatsApp para seus clientes",
+              "Filtro inteligente (4-5⭐ Google / 1-3⭐ Ouvidoria Privada)",
+              "Notificação por e-mail e roteiros prontos de recuperação no WhatsApp",
+              "Gerador de Arte Digital de Balcão & QR Code prontos para impressão",
+              "Disparador rápido de convites de avaliação via WhatsApp",
               "Comprovante e fatura formal para contabilidade",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5 text-xs text-slate-300">
@@ -323,8 +323,8 @@ export default function CheckoutPage() {
                     <CreditCard className="w-5 h-5" />
                     <span>
                       {plan === "annual"
-                        ? "Continuar no Plano Anual (12x R$ 29,90 ou Pix)"
-                        : "Continuar no Plano Mensal (R$ 49,90/mês)"}
+                        ? "Continuar no Plano Anual (Pix ou Cartão)"
+                        : "Continuar no Plano Mensal (Pix ou Cartão)"}
                     </span>
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </>

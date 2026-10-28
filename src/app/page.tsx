@@ -143,7 +143,7 @@ export default function LandingPage() {
                   href="#planos"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Ativar por R$ 29,90/mês</span>
+                  <span>Ver Planos e Preços</span>
                   <Sparkles className="w-4 h-4 text-amber-300" />
                 </a>
               </>
@@ -226,7 +226,7 @@ export default function LandingPage() {
                   {demoRating} Estrelas: Bloqueado do Google!
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  A queixa não vai a público! O sistema abre um formulário interno privado e envia um alerta direto no WhatsApp do dono da empresa para resolver a crise.
+                  A queixa não vai a público! O sistema abre um formulário interno privado, registra na sua Ouvidoria e notifica você por e-mail para resolver a situação e recuperar o cliente.
                 </p>
                 <button
                   onClick={resetDemo}
@@ -329,11 +329,11 @@ export default function LandingPage() {
 
                   <ul className="space-y-3">
                     {[
-                      "Página exclusiva personalizada com as cores da sua loja",
-                      "Filtro inteligente (4-5⭐ Google / 1-3⭐ Ouvidoria Privada)",
-                      "Alerta instantâneo no seu WhatsApp em caso de crítica",
-                      "Gerador de Plaquinha Oficial de Balcão para impressão",
-                      "Disparador rápido de convites por WhatsApp",
+                      "Página exclusiva personalizada com o nome e cores da sua empresa",
+                      "Filtro inteligente (4-5⭐ vão para o Google / 1-3⭐ ficam na Ouvidoria)",
+                      "Ouvidoria Privada com alerta por e-mail e roteiros de resposta no WhatsApp",
+                      "Gerador de Arte Digital de Balcão & QR Code prontos para impressão",
+                      "Disparador rápido de convites de avaliação via WhatsApp",
                     ].map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300">
                         <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
@@ -367,7 +367,7 @@ export default function LandingPage() {
                     </span>
                     <h3 className="text-xl font-bold text-white">Plano Anual</h3>
                     <p className="text-xs text-slate-300 mt-1">
-                      Economize 40% e garanta 12 meses de proteção contínua para o QR Code do seu balcão.
+                      Todos os recursos liberados com 40% de economia e 1 ano inteiro sem preocupação com mensalidades.
                     </p>
                   </div>
 
@@ -384,10 +384,10 @@ export default function LandingPage() {
 
                   <ul className="space-y-3">
                     {[
-                      "Tudo do Plano Mensal com 40% de desconto garantido",
-                      "QR Code fixo garantido por 12 meses sem risco de interrupção",
-                      "Plaquinha de Acrílico/Balcão em alta definição (300 DPI)",
-                      "Painel de Ouvidoria com histórico de resolução de casos",
+                      "Todos os recursos do Plano Mensal 100% liberados",
+                      "Economia imediata de 40% (você economiza R$ 240 no ano)",
+                      "12 meses completos de acesso sem se preocupar com faturas mensais",
+                      "Arte Digital de Balcão em alta definição (300 DPI) + QR Code exclusivo",
                       "Garantia incondicional de 7 dias ou seu dinheiro de volta",
                     ].map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
@@ -403,7 +403,7 @@ export default function LandingPage() {
                     href="/checkout?plan=annual"
                     className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
                   >
-                    <span>Ativar Plano Anual (12x R$ 29,90)</span>
+                    <span>Começar no Plano Anual</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>

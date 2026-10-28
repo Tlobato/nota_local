@@ -710,7 +710,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
-                    Receberá avisos se um cliente relatar insatisfação interna.
+                    Contato principal do gestor (as notificações de críticas vão para o e-mail e Ouvidoria).
                   </p>
                 </div>
 
