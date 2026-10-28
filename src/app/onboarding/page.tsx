@@ -28,6 +28,27 @@ export default function OnboardingPage() {
     coverColor: "#2563eb",
   });
 
+  const COLOR_PRESETS = [
+    "#2563eb",
+    "#0d9488",
+    "#e11d48",
+    "#d97706",
+    "#ea580c",
+    "#7c3aed",
+    "#0f172a",
+    "#4f46e5",
+  ];
+
+  const formatPhoneMask = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length === 0) return "";
+    if (digits.length <= 2) return `(${digits}`;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10)
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
   // Gerar slug automaticamente ao digitar o nome
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -187,9 +208,11 @@ export default function OnboardingPage() {
               </label>
               <input
                 type="tel"
-                placeholder="Ex: 15998383997"
+                placeholder="(11) 99999-9999"
                 value={form.notificationPhone}
-                onChange={(e) => setForm({ ...form, notificationPhone: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, notificationPhone: formatPhoneMask(e.target.value) })
+                }
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
               <p className="text-[11px] text-slate-400 mt-1">
@@ -202,12 +225,26 @@ export default function OnboardingPage() {
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Cor de Destaque da sua Marca
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
+                {COLOR_PRESETS.map((hex) => (
+                  <button
+                    key={hex}
+                    type="button"
+                    onClick={() => setForm({ ...form, coverColor: hex })}
+                    className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer ${
+                      form.coverColor.toLowerCase() === hex.toLowerCase()
+                        ? "border-slate-900 scale-110 shadow-md"
+                        : "border-transparent opacity-80 hover:opacity-100"
+                    }`}
+                    style={{ backgroundColor: hex }}
+                  />
+                ))}
                 <input
                   type="color"
                   value={form.coverColor}
                   onChange={(e) => setForm({ ...form, coverColor: e.target.value })}
-                  className="w-12 h-10 p-1 rounded-xl border border-slate-200 cursor-pointer bg-white"
+                  className="w-9 h-9 p-0.5 rounded-xl border border-slate-200 cursor-pointer bg-white"
+                  title="Escolher outra cor"
                 />
                 <span className="text-xs text-slate-500 font-mono">{form.coverColor}</span>
               </div>

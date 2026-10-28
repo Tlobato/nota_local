@@ -16,7 +16,7 @@ interface CreateCustomerInput {
 
 interface CreatePaymentInput {
   customerId: string;
-  value: number; // Ex: 490.00
+  value: number; // Ex: 297.00
   description: string;
   dueDate: string; // YYYY-MM-DD
   maxInstallmentCount?: number; // Ex: 12

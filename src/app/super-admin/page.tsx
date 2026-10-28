@@ -89,7 +89,7 @@ export default async function SuperAdminPage() {
     (b) => (b.paymentStatus === "active" || b.paymentStatus === "gift") && !b.isDemo
   ).length;
   const totalFeedbacks = enrichedBusinesses.reduce((acc, curr) => acc + curr.feedbackCount, 0);
-  const estimatedRevenue = enrichedBusinesses.filter((b) => b.paymentStatus === "active" && !b.isDemo).length * 490;
+  const estimatedRevenue = enrichedBusinesses.filter((b) => b.paymentStatus === "active" && !b.isDemo).length * 297;
 
   return (
     <SuperAdminDashboard

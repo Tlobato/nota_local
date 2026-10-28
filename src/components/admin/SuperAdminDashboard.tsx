@@ -381,10 +381,10 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
             <div className="text-3xl font-extrabold text-purple-400">
               R${" "}
               {(
-                businessesList.filter((b) => b.paymentStatus === "active" && !b.isDemo).length * 490
+                businessesList.filter((b) => b.paymentStatus === "active" && !b.isDemo).length * 297
               ).toLocaleString("pt-BR")}
             </div>
-            <p className="text-xs text-slate-400 mt-1">Base de cálculo R$ 490 por pagante</p>
+            <p className="text-xs text-slate-400 mt-1">Base Plano Anual (R$ 297 / 12x R$ 29,90)</p>
           </div>
         </div>
 
@@ -723,7 +723,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     onChange={(e) => setForm({ ...form, paymentStatus: e.target.value })}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                   >
-                    <option value="active">Ativo (Pagante R$ 490)</option>
+                    <option value="active">Ativo (Pagante — Anual R$ 297 / Mensal R$ 49,90)</option>
                     <option value="gift">🎁 Cortesia / Amigo / Teste Grátis</option>
                     <option value="pending">Pendente (Aguardando Pagamento)</option>
                   </select>
