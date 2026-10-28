@@ -17,15 +17,33 @@ import {
   Zap,
   Building,
   HeartHandshake,
+  MessageSquareWarning,
+  Send,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import Logo from "@/components/Logo";
 
+const SIMULATOR_RATINGS: Record<number, { label: string; emoji: string }> = {
+  1: { label: "Muito insatisfeito", emoji: "😞" },
+  2: { label: "Poderia ser melhor", emoji: "🙁" },
+  3: { label: "Razoável / Regular", emoji: "😐" },
+  4: { label: "Muito bom!", emoji: "😊" },
+  5: { label: "Excelente! Perfeito!", emoji: "🤩" },
+};
+
 export default function LandingPage() {
   const { isSignedIn, isLoaded } = useAuth();
+  const [hoverStar, setHoverStar] = useState<number | null>(null);
   const [demoRating, setDemoRating] = useState<number | null>(null);
-  const [demoStep, setDemoStep] = useState<"choose" | "positive" | "negative">("choose");
+  const [demoStep, setDemoStep] = useState<
+    "choose" | "positive" | "negative_form" | "negative_done"
+  >("choose");
+  const [demoName, setDemoName] = useState("");
+  const [demoPhone, setDemoPhone] = useState("");
+  const [demoComment, setDemoComment] = useState("");
+
+  const activeStar = hoverStar || demoRating || 0;
 
   const handleTestStar = (star: number) => {
     setDemoRating(star);
@@ -33,12 +51,16 @@ export default function LandingPage() {
       setDemoStep("positive");
       confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
     } else {
-      setDemoStep("negative");
+      setDemoStep("negative_form");
     }
   };
 
   const resetDemo = () => {
     setDemoRating(null);
+    setHoverStar(null);
+    setDemoName("");
+    setDemoPhone("");
+    setDemoComment("");
     setDemoStep("choose");
   };
 
@@ -167,75 +189,228 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Container do Simulador */}
-          <div className="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 max-w-md mx-auto shadow-2xl border border-slate-100">
-            <div className="text-center pb-4 border-b border-slate-100">
-              <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">
-                Simulação: Clínica Exemplo
-              </span>
-              <h3 className="text-lg font-bold mt-1 text-slate-800">
-                Como foi sua experiência conosco hoje?
+          {/* Container do Simulador (Idêntico à experiência real do cliente) */}
+          <div className="w-full max-w-md mx-auto bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+            {/* Banner Superior da Empresa Simulada */}
+            <div
+              className="h-24 flex flex-col justify-end p-5 text-white relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #2563eb 0%, #1e293b 100%)",
+              }}
+            >
+              <div className="absolute top-3 right-4 flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Canal Oficial de Atendimento</span>
+              </div>
+              <p className="text-[11px] uppercase tracking-wider text-white/75 font-semibold">
+                Simulação Interativa
+              </p>
+              <h3 className="text-lg font-bold truncate leading-tight">
+                Sua Empresa / Clínica Aqui
               </h3>
             </div>
 
-            {demoStep === "choose" && (
-              <div className="py-6 text-center space-y-4">
-                <div className="flex justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
+            <div className="p-6">
+              {demoStep === "choose" && (
+                <div className="py-2 text-center">
+                  <h4 className="text-base sm:text-lg font-bold text-slate-800 mb-1.5">
+                    Como foi sua experiência conosco hoje?
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-500 mb-5">
+                    Toque nas estrelas abaixo para testar os dois caminhos:
+                  </p>
+
+                  <div className="flex justify-center items-center gap-2 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const isFilled = star <= activeStar;
+                      return (
+                        <button
+                          key={star}
+                          type="button"
+                          onMouseEnter={() => setHoverStar(star)}
+                          onMouseLeave={() => setHoverStar(null)}
+                          onClick={() => handleTestStar(star)}
+                          className="p-1.5 hover:scale-125 active:scale-95 transition-transform cursor-pointer"
+                        >
+                          <Star
+                            className={`w-10 h-10 transition-colors ${
+                              isFilled
+                                ? "fill-amber-400 text-amber-400 filter drop-shadow-sm"
+                                : "fill-amber-400/20 text-amber-400/60"
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="h-8 flex items-center justify-center">
+                    {activeStar > 0 ? (
+                      <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-50 px-3.5 py-1 rounded-full border border-slate-200/80">
+                        <span>{SIMULATOR_RATINGS[activeStar].emoji}</span>
+                        <span>{SIMULATOR_RATINGS[activeStar].label}</span>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-500">
+                        Experimente clicar em <strong>5 estrelas</strong> ou em{" "}
+                        <strong>2 estrelas</strong>.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {demoStep === "positive" && (
+                <div className="py-2 text-center space-y-3 animate-in fade-in">
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Cenário {demoRating} Estrelas: Cliente direcionado ao Google!</span>
+                  </div>
+
+                  <div className="pt-2">
+                    <span className="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                      {"⭐".repeat(demoRating || 5)} Experiência Incrível!
+                    </span>
+                    <h4 className="text-lg font-bold text-slate-900">
+                      Muito obrigado pelo carinho!
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                      Como o cliente deu nota alta, o sistema agradece e já abre automaticamente a caixa de avaliação oficial da sua empresa no Google!
+                    </p>
+                  </div>
+
+                  <div className="pt-2">
+                    <div className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-md">
+                      <span>Abrindo Avaliação no Google...</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={resetDemo}
+                    className="pt-2 text-xs text-blue-600 font-bold hover:underline cursor-pointer block mx-auto"
+                  >
+                    ← Voltar e testar nota baixa (1 a 3 estrelas)
+                  </button>
+                </div>
+              )}
+
+              {demoStep === "negative_form" && (
+                <div className="py-1 animate-in fade-in space-y-3">
+                  {/* Explicação do que está acontecendo para o dono do negócio */}
+                  <div className="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-xl text-[11px] leading-snug flex items-start gap-2">
+                    <ShieldAlert className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Veja o filtro em ação ({demoRating}⭐):</strong> Em vez de mandar o cliente irritado para o Google, abrimos na hora esta Ouvidoria Privada para ele desabafar direto com você:
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200/80 p-3 rounded-2xl text-amber-900">
+                    <MessageSquareWarning className="w-5 h-5 text-amber-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-semibold">Sentimos muito por isso!</p>
+                      <p className="text-[11px] text-amber-800/90">
+                        Queremos ouvir você para corrigir qualquer falha imediatamente.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800">
+                      Como podemos melhorar?
+                    </h4>
+                    <p className="text-[11px] text-slate-500">
+                      Sua mensagem vai direto para a gerência para resolvermos seu caso com prioridade.
+                    </p>
+                  </div>
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      setDemoStep("negative_done");
+                    }}
+                    className="space-y-2.5 text-left"
+                  >
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                        Seu Nome (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: João da Silva"
+                        value={demoName}
+                        onChange={(e) => setDemoName(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                        Seu WhatsApp (para retorno e solução)
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="(11) 99999-9999"
+                        value={demoPhone}
+                        onChange={(e) => setDemoPhone(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                        O que aconteceu em seu atendimento?
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder="Conte o que houve para podermos resolver..."
+                        value={demoComment}
+                        onChange={(e) => setDemoComment(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 resize-none"
+                      />
+                    </div>
+
                     <button
-                      key={star}
-                      onClick={() => handleTestStar(star)}
-                      className="p-1 hover:scale-125 transition-transform"
+                      type="submit"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-md cursor-pointer"
                     >
-                      <Star className="w-10 h-10 fill-amber-400 text-amber-400 filter drop-shadow-sm" />
+                      <span>Enviar Mensagem para a Gerência</span>
+                      <Send className="w-3.5 h-3.5" />
                     </button>
-                  ))}
-                </div>
-                <p className="text-xs text-slate-500">
-                  Experimente clicar em <strong>5 estrelas</strong> ou em <strong>2 estrelas</strong>.
-                </p>
-              </div>
-            )}
 
-            {demoStep === "positive" && (
-              <div className="py-4 text-center space-y-3 animate-in fade-in">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
+                    <button
+                      type="button"
+                      onClick={resetDemo}
+                      className="w-full text-center text-xs text-blue-600 font-semibold hover:underline pt-1 cursor-pointer"
+                    >
+                      ← Voltar e testar outra nota
+                    </button>
+                  </form>
                 </div>
-                <h4 className="text-base font-bold text-emerald-700">
-                  {demoRating} Estrelas: Direcionado ao Google!
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  O cliente feliz recebe os parabéns e é redirecionado em 2 segundos para o link oficial de review da sua empresa no Google, aumentando suas 5 estrelas públicas!
-                </p>
-                <button
-                  onClick={resetDemo}
-                  className="mt-2 text-xs text-blue-600 font-semibold hover:underline"
-                >
-                  Testar outra nota
-                </button>
-              </div>
-            )}
+              )}
 
-            {demoStep === "negative" && (
-              <div className="py-4 text-center space-y-3 animate-in fade-in">
-                <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
-                  <ShieldAlert className="w-8 h-8" />
+              {demoStep === "negative_done" && (
+                <div className="py-4 text-center space-y-3 animate-in fade-in">
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900">
+                    Mensagem recebida na Ouvidoria!
+                  </h4>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Pronto! O cliente já desabafou aqui no canal privado (sem publicar no Google) e você recebe o relato no seu painel e por e-mail para chamá-lo no WhatsApp e reverter a situação!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={resetDemo}
+                    className="mt-2 text-xs text-blue-600 font-bold hover:underline cursor-pointer"
+                  >
+                    ← Testar novamente do início
+                  </button>
                 </div>
-                <h4 className="text-base font-bold text-amber-700">
-                  {demoRating} Estrelas: Bloqueado do Google!
-                </h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  A queixa não vai a público! O sistema abre um formulário interno privado, registra na sua Ouvidoria e notifica você por e-mail para resolver a situação e recuperar o cliente.
-                </p>
-                <button
-                  onClick={resetDemo}
-                  className="mt-2 text-xs text-blue-600 font-semibold hover:underline"
-                >
-                  Testar outra nota
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </section>

@@ -133,6 +133,18 @@ export default function SuperAdminDashboard({
   const [editingProspect, setEditingProspect] = useState<Prospect | null>(null);
   const [savingProspect, setSavingProspect] = useState(false);
   const [prospectError, setProspectError] = useState<string | null>(null);
+  const [showPitchPlaybook, setShowPitchPlaybook] = useState(false);
+  const [copiedPitch, setCopiedPitch] = useState(false);
+
+  const OFFICIAL_PITCH_TEXT = `Olá, tudo bem?
+
+Eu desenvolvi uma aplicação simples focada em ajudar empresas e clínicas a cuidarem melhor das avaliações no Google.
+
+A ideia é bem prática: quando você envia o link (ou o cliente lê o QR Code na recepção), o sistema faz uma triagem rápida. Se o cliente der 4 ou 5 estrelas, ele é direcionado direto para publicar o elogio no Google. Mas se ele der de 1 a 3 estrelas, em vez de ir pro Google, abre na hora uma ouvidoria privada direto com você — assim a pessoa já desabafa ali mesmo e você consegue contornar a situação antes de virar uma crítica pública.
+
+Deixei um simulador rápido no site onde dá para testar os dois cenários em 20 segundos: https://notalocal.vercel.app/#simulador
+
+Se achar que faz sentido para vocês, podemos conversar rapidamente sobre como funciona. Também sou daqui de Sorocaba, qualquer dúvida estou por aqui!`;
 
   const [prospectForm, setProspectForm] = useState({
     businessName: "",
@@ -512,10 +524,9 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
     if (!p.phone) return null;
     const digits = p.phone.replace(/\D/g, "");
     const formatted = digits.startsWith("55") ? digits : `55${digits}`;
-    const greeting = p.contactName
-      ? `Olá ${p.contactName}, tudo bem?`
-      : `Olá, tudo bem? Falo com o responsável pela ${p.businessName}?`;
-    return `https://wa.me/${formatted}?text=${encodeURIComponent(greeting)}`;
+    const salutation = p.contactName ? `Olá ${p.contactName}, tudo bem?` : `Olá, tudo bem?`;
+    const pitchBody = OFFICIAL_PITCH_TEXT.replace(/^Olá, tudo bem\?/, salutation);
+    return `https://wa.me/${formatted}?text=${encodeURIComponent(pitchBody)}`;
   };
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -1020,6 +1031,90 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
             {/* Painel Principal do CRM */}
             <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-6 backdrop-blur space-y-6">
+              {/* Cofre do Pitch Oficial & Estatísticas (Sempre à mão no CRM) */}
+              <div className="bg-slate-900/90 border border-blue-500/30 rounded-2xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white">
+                        💎 Meu Roteiro Oficial de Abordagem & Estatísticas do Pitch
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        Sua mensagem aprovada (já vai preenchida ao clicar em &quot;Chamar no Zap&quot;) + dados de mercado para reuniões.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(OFFICIAL_PITCH_TEXT);
+                        setCopiedPitch(true);
+                        setTimeout(() => setCopiedPitch(false), 2500);
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                    >
+                      {copiedPitch ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Copiar Abordagem</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPitchPlaybook(!showPitchPlaybook)}
+                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 cursor-pointer transition-colors"
+                    >
+                      {showPitchPlaybook ? "Ocultar Roteiro" : "Ver Texto & Estatísticas"}
+                    </button>
+                  </div>
+                </div>
+
+                {showPitchPlaybook && (
+                  <div className="mt-4 pt-4 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-4 animate-in fade-in duration-150">
+                    <div className="lg:col-span-7 space-y-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-400 block">
+                        Mensagem Oficial de 1º Contato (WhatsApp / Direct):
+                      </span>
+                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans select-all">
+                        {OFFICIAL_PITCH_TEXT}
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-5 space-y-2.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 block">
+                        📊 Estatísticas & Argumentos para Conversas:
+                      </span>
+                      <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                        <p>
+                          <strong className="text-white">1. O Efeito &quot;Válvula de Escape&quot; (80%+):</strong>{" "}
+                          Mais de 80% dos clientes insatisfeitos não vão ao Google por maldade; eles só reclamam em público quando não encontram um canal direto para serem ouvidos pela gerência na hora. Ao desabafar na nossa Ouvidoria Privada, a pessoa sente que já cumpriu seu objetivo.
+                        </p>
+                        <p>
+                          <strong className="text-white">2. Recuperação de Clientes (70% a 90%):</strong>{" "}
+                          Estudos de retenção mostram que entre 70% e 90% dos clientes que registram uma queixa privada e recebem retorno rápido do responsável não só deixam de reclamar no Google como voltam a comprar.
+                        </p>
+                        <p>
+                          <strong className="text-white">3. Fim do &quot;Tiro no Pé&quot;:</strong>{" "}
+                          Quando a empresa manda o link direto do Google para todos os clientes, ela mesma empurra para o Google quem teve um pequeno contratempo. Com o NotaLocal, você pede avaliação para 100% dos clientes com segurança.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Barra de Busca + Botão Novo Prospecto */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div className="relative flex-1 max-w-md">
