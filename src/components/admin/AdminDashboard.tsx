@@ -214,7 +214,7 @@ export default function AdminDashboard({
   useEffect(() => {
     if (canvasRef.current && publicUrl) {
       QRCodeLib.toCanvas(canvasRef.current, publicUrl, {
-        width: 260,
+        width: 176,
         margin: 2,
         color: {
           dark: "#0f172a",
@@ -230,12 +230,22 @@ export default function AdminDashboard({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const downloadQrCode = () => {
-    if (canvasRef.current) {
+  const downloadQrCode = async () => {
+    try {
+      const highResUrl = await QRCodeLib.toDataURL(publicUrl, {
+        width: 600,
+        margin: 2,
+        color: {
+          dark: "#0f172a",
+          light: "#ffffff",
+        },
+      });
       const link = document.createElement("a");
       link.download = `qrcode-${currentBusiness.slug}.png`;
-      link.href = canvasRef.current.toDataURL("image/png");
+      link.href = highResUrl;
       link.click();
+    } catch (err) {
+      console.error("Erro ao baixar QR Code:", err);
     }
   };
 
@@ -353,9 +363,12 @@ export default function AdminDashboard({
   };
 
   // Imprimir Display de Mesa formatado para Acrílico A5 / 10x15cm
-  const handlePrintDisplay = () => {
-    if (!canvasRef.current) return;
-    const qrDataUrl = canvasRef.current.toDataURL("image/png");
+  const handlePrintDisplay = async () => {
+    const qrDataUrl = await QRCodeLib.toDataURL(publicUrl, {
+      width: 600,
+      margin: 2,
+      color: { dark: "#0f172a", light: "#ffffff" },
+    });
     const businessNameToShow = displayBusinessName.trim() || currentBusiness.name;
     const printWindow = window.open("", "_blank", "width=850,height=950");
     if (!printWindow) {
@@ -649,8 +662,8 @@ export default function AdminDashboard({
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800">
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+      <aside className="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-b md:border-b-0 md:border-r border-slate-800">
+        <div className="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
           <div
             onClick={() => setActiveTab("overview")}
             className="cursor-pointer"
@@ -660,47 +673,60 @@ export default function AdminDashboard({
               Painel Gestor
             </span>
           </div>
+
+          {/* Atalhos rápidos no topo apenas para Mobile */}
+          <div className="flex md:hidden items-center gap-2">
+            <a
+              href={publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-200 text-[11px] font-semibold flex items-center gap-1 border border-slate-700"
+            >
+              <span>Ver Página</span>
+              <ExternalLink className="w-3 h-3 text-blue-400" />
+            </a>
+          </div>
         </div>
 
         {/* Seletor de Estabelecimento */}
-        <div className="px-4 py-3 border-b border-slate-800/80 bg-slate-950/50">
-          <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">
+        <div className="px-4 py-2.5 sm:py-3 border-b border-slate-800/80 bg-slate-950/50 flex items-center justify-between md:block">
+          <label className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block md:mb-1">
             Empresa Ativa
           </label>
-          <div className="flex items-center gap-2 text-white font-medium text-sm truncate">
+          <div className="flex items-center gap-2 text-white font-medium text-xs sm:text-sm truncate">
             <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
             <span className="truncate">{currentBusiness.name}</span>
           </div>
         </div>
 
-        {/* Navegação */}
-        <nav className="p-4 space-y-1.5 flex-1">
+        {/* Navegação (Grid 2x2 compacto no mobile, lista vertical no desktop) */}
+        <nav className="p-3 sm:p-4 grid grid-cols-2 gap-1.5 md:flex md:flex-col md:space-y-1.5 md:flex-1">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`w-full flex items-center gap-2 md:gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "overview"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 bg-slate-800/30 md:bg-transparent"
             }`}
           >
-            <TrendingUp className="w-4 h-4" />
-            <span>Visão Geral & Métricas</span>
+            <TrendingUp className="w-4 h-4 shrink-0" />
+            <span className="truncate">Visão Geral</span>
           </button>
 
           <button
             onClick={() => setActiveTab("feedbacks")}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "feedbacks"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 bg-slate-800/30 md:bg-transparent"
             }`}
           >
-            <div className="flex items-center gap-3">
-              <ShieldAlert className="w-4 h-4" />
-              <span>Críticas Retidas</span>
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
+              <ShieldAlert className="w-4 h-4 shrink-0" />
+              <span className="truncate">Críticas Retidas</span>
             </div>
             {pendingCritiques > 0 && (
-              <span className="bg-amber-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">
+              <span className="bg-amber-500 text-slate-950 text-[11px] px-1.5 py-0.5 rounded-full font-bold shrink-0 ml-1">
                 {pendingCritiques}
               </span>
             )}
@@ -708,31 +734,31 @@ export default function AdminDashboard({
 
           <button
             onClick={() => setActiveTab("qrcode")}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`w-full flex items-center gap-2 md:gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "qrcode"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 bg-slate-800/30 md:bg-transparent"
             }`}
           >
-            <QrCode className="w-4 h-4" />
-            <span>QR Code & Envio Zap</span>
+            <QrCode className="w-4 h-4 shrink-0" />
+            <span className="truncate">QR Code & Zap</span>
           </button>
 
           <button
             onClick={() => setActiveTab("settings")}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            className={`w-full flex items-center gap-2 md:gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "settings"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 bg-slate-800/30 md:bg-transparent"
             }`}
           >
-            <Settings className="w-4 h-4" />
-            <span>Configurações</span>
+            <Settings className="w-4 h-4 shrink-0" />
+            <span className="truncate">Configurações</span>
           </button>
         </nav>
 
-        {/* Rodapé da Sidebar */}
-        <div className="p-4 border-t border-slate-800 text-xs text-slate-500 flex flex-col gap-2">
+        {/* Rodapé da Sidebar (Oculto no mobile para economizar altura, visível no desktop) */}
+        <div className="hidden md:flex p-4 border-t border-slate-800 text-xs text-slate-500 flex-col gap-2">
           <a
             href={publicUrl}
             target="_blank"
@@ -756,7 +782,7 @@ export default function AdminDashboard({
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 sm:p-8 max-w-6xl overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 p-4 sm:p-8 max-w-6xl overflow-x-hidden">
         {/* TAB 1: VISÃO GERAL */}
         {activeTab === "overview" && (
           <div className="space-y-8 animate-in fade-in duration-200">
@@ -847,15 +873,18 @@ export default function AdminDashboard({
             </div>
 
             {/* Últimos Feedbacks Recebidos */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
               <h3 className="text-base font-bold text-slate-900 mb-4">
                 Últimas Avaliações Recebidas
               </h3>
               <div className="divide-y divide-slate-100">
                 {feedbacks.slice(0, 5).map((f) => (
-                  <div key={f.id} className="py-3.5 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex">
+                  <div
+                    key={f.id}
+                    className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4"
+                  >
+                    <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                      <div className="flex shrink-0 mt-0.5 sm:mt-0">
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star
                             key={s}
@@ -867,16 +896,31 @@ export default function AdminDashboard({
                           />
                         ))}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-800">
-                          {f.customerName || "Cliente anônimo"}
-                        </p>
-                        <p className="text-xs text-slate-500 truncate max-w-md">
-                          {f.comment || (f.redirectedToGoogle ? "Avaliação 5 estrelas enviada ao Google" : "Sem comentário escrito")}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2 sm:block">
+                          <p className="text-sm font-medium text-slate-800 truncate">
+                            {f.customerName || "Cliente anônimo"}
+                          </p>
+                          {/* Badge visível ao lado do nome em telas mobile para nunca estourar */}
+                          <span
+                            className={`sm:hidden shrink-0 inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                              f.redirectedToGoogle
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-amber-50 text-amber-700 border border-amber-200"
+                            }`}
+                          >
+                            {f.redirectedToGoogle ? "Enviado ao Google" : "Retido no Painel"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 break-words sm:truncate sm:max-w-md mt-0.5">
+                          {f.comment ||
+                            (f.redirectedToGoogle
+                              ? "Avaliação 5 estrelas enviada ao Google"
+                              : "Sem comentário escrito")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
+                    <div className="hidden sm:block text-right shrink-0">
                       <span
                         className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
                           f.redirectedToGoogle
@@ -1301,9 +1345,9 @@ export default function AdminDashboard({
                 )}
 
                 {/* Mockup / Preview Físico do Display de Balcão (Acrílico) */}
-                <div className="relative mx-auto w-full max-w-[340px] bg-gradient-to-b from-slate-100 to-slate-200/70 p-4 rounded-3xl border border-slate-200 shadow-md">
+                <div className="relative mx-auto w-full max-w-[340px] bg-gradient-to-b from-slate-100 to-slate-200/70 p-3 sm:p-4 rounded-3xl border border-slate-200 shadow-md">
                   {/* Placa propriamente dita */}
-                  <div className="bg-white rounded-2xl border-2 border-slate-200/90 p-6 text-center shadow-lg space-y-3 relative overflow-hidden">
+                  <div className="bg-white rounded-2xl border-2 border-slate-200/90 p-4 sm:p-6 text-center shadow-lg space-y-3 relative overflow-hidden flex flex-col items-center">
                     {/* Linha decorativa da cor da marca */}
                     <div
                       className="w-16 h-1.5 mx-auto rounded-full"
@@ -1318,31 +1362,34 @@ export default function AdminDashboard({
                     </div>
 
                     {/* Nome da Empresa */}
-                    <h4 className="text-base font-extrabold text-slate-800 tracking-tight">
+                    <h4 className="text-base font-extrabold text-slate-800 tracking-tight break-words max-w-full">
                       {displayBusinessName.trim() || currentBusiness.name}
                     </h4>
 
                     {/* Chamadas configuráveis */}
-                    <div>
-                      <p className="text-sm font-bold text-slate-900 leading-snug">
+                    <div className="w-full">
+                      <p className="text-sm font-bold text-slate-900 leading-snug break-words">
                         {displayHeadline}
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed max-w-[240px] mx-auto">
+                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed max-w-[240px] mx-auto break-words">
                         {displaySubheadline}
                       </p>
                     </div>
 
-                    {/* Canvas do QR Code Embutido */}
-                    <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-100 inline-block shadow-inner">
-                      <canvas ref={canvasRef} className="rounded-lg w-44 h-44 mx-auto" />
+                    {/* Canvas do QR Code Embutido — 100% Centralizado */}
+                    <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center shadow-inner mx-auto">
+                      <canvas
+                        ref={canvasRef}
+                        className="rounded-lg !w-40 !h-40 sm:!w-44 sm:!h-44 max-w-full block mx-auto"
+                      />
                     </div>
 
                     {/* Selo de Rapidez e Segurança */}
-                    <div className="pt-1">
+                    <div className="pt-1 w-full">
                       <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-200/60">
                         ⚡ Leva menos de 30 segundos
                       </span>
-                      <p className="text-[9px] text-slate-400 font-mono mt-1 truncate">
+                      <p className="text-[9px] text-slate-400 font-mono mt-1 truncate max-w-full px-1">
                         {publicUrl}
                       </p>
                     </div>
@@ -1759,8 +1806,8 @@ export default function AdminDashboard({
             <div className="space-y-4 text-slate-800">
               {/* Script 1 */}
               <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-800 bg-blue-100 px-2.5 py-0.5 rounded-full self-start">
                     Passo 1: Acolhimento & Desculpas Sinceras
                   </span>
                   <div className="flex gap-2">
@@ -1798,8 +1845,8 @@ export default function AdminDashboard({
 
               {/* Script 2 */}
               <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full self-start">
                     Passo 2: Compensação & Encantamento
                   </span>
                   <div className="flex gap-2">
@@ -1837,8 +1884,8 @@ export default function AdminDashboard({
 
               {/* Script 3 */}
               <div className="border border-emerald-200 rounded-2xl p-4 bg-emerald-50/50 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full self-start">
                     Passo 3: A Mágica da Reversão para 5⭐ no Google
                   </span>
                   <div className="flex gap-2">

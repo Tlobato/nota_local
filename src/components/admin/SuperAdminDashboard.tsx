@@ -293,28 +293,28 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Topbar */}
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-30 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-30 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Logo />
-            <div className="h-5 w-[1px] bg-slate-700" />
+            <div className="hidden sm:block h-5 w-[1px] bg-slate-700" />
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black tracking-widest uppercase bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full shadow-sm">
+              <span className="text-[10px] sm:text-xs font-black tracking-widest uppercase bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 sm:px-2.5 py-0.5 rounded-full shadow-sm whitespace-nowrap">
                 Master Admin
               </span>
               {adminEmail && (
-                <span className="text-xs text-slate-400 hidden sm:inline font-mono">
+                <span className="text-xs text-slate-400 hidden lg:inline font-mono">
                   {adminEmail}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/clinica-sorriso"
               target="_blank"
-              className="text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5"
+              className="hidden sm:flex text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 px-3.5 py-2 rounded-xl transition-all items-center gap-1.5"
             >
               <Eye className="w-3.5 h-3.5 text-blue-400" />
               Ver Demonstração
@@ -322,17 +322,17 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 px-4 py-2 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 px-3 sm:px-4 py-2 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
-              Novo Cliente
+              <span>Novo Cliente</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 overflow-x-hidden">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-slate-800/50 border border-slate-700/60 p-5 rounded-2xl relative overflow-hidden backdrop-blur">
@@ -389,7 +389,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
         </div>
 
         {/* Section Clientes */}
-        <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur">
+        <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-6 backdrop-blur">
           {/* Filters Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
             <div className="relative w-full sm:w-80">
@@ -426,8 +426,94 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          {/* Lista Mobile em Cards (Exibida apenas em celulares < md) */}
+          <div className="md:hidden space-y-3">
+            {filteredBusinesses.map((b) => (
+              <div
+                key={b.id}
+                className="bg-slate-900/70 border border-slate-700/80 rounded-2xl p-4 space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
+                      {b.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-white text-sm flex items-center gap-1.5 flex-wrap">
+                        <span className="truncate">{b.name}</span>
+                        {b.isDemo && (
+                          <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                            DEMO
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-slate-400 truncate">/{b.slug}</div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleToggleStatus(b.id, b.paymentStatus)}
+                    className={`shrink-0 whitespace-nowrap text-[11px] font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
+                      b.paymentStatus === "gift"
+                        ? "bg-purple-500/10 text-purple-300 border-purple-500/30"
+                        : b.paymentStatus === "active"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    }`}
+                  >
+                    {b.paymentStatus === "gift"
+                      ? "🎁 Cortesia"
+                      : b.paymentStatus === "active"
+                      ? "Ativo"
+                      : "Pendente"}
+                  </button>
+                </div>
+
+                <div className="bg-slate-950/60 rounded-xl p-2.5 space-y-1.5 text-xs border border-slate-800/80">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-400 shrink-0">E-mail:</span>
+                    <span className="font-mono text-slate-200 truncate">
+                      {b.ownerEmail || "Não vinculado"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-400 shrink-0">WhatsApp:</span>
+                    <span className="text-slate-300 truncate">
+                      {b.notificationPhone || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-400 shrink-0">Avaliações:</span>
+                    <span className="inline-flex items-center gap-1 font-bold text-amber-400 text-xs">
+                      <Star className="w-3 h-3 fill-amber-400" />
+                      {b.feedbackCount}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Link
+                    href={`/${b.slug}`}
+                    target="_blank"
+                    className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 border border-slate-700 transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Página Pública</span>
+                  </Link>
+                  <Link
+                    href={`/admin?businessId=${b.id}`}
+                    className="py-2 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Abrir Painel</span>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Table Desktop/Tablet */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="text-xs uppercase text-slate-400 border-b border-slate-700/80 bg-slate-900/40">
                 <tr>
@@ -444,7 +530,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                   <tr key={b.id} className="hover:bg-slate-800/40 transition-colors">
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
                           {b.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
@@ -464,7 +550,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     <td className="py-4 px-4 text-slate-300 font-mono text-xs">
                       {b.ownerEmail ? (
                         <span className="flex items-center gap-1.5 text-slate-200">
-                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           {b.ownerEmail}
                         </span>
                       ) : (
@@ -472,10 +558,10 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       )}
                     </td>
 
-                    <td className="py-4 px-4 text-slate-300 text-xs">
+                    <td className="py-4 px-4 text-slate-300 text-xs whitespace-nowrap">
                       {b.notificationPhone ? (
                         <span className="flex items-center gap-1.5 text-slate-300">
-                          <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           {b.notificationPhone}
                         </span>
                       ) : (
@@ -483,18 +569,18 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       )}
                     </td>
 
-                    <td className="py-4 px-4 text-center">
+                    <td className="py-4 px-4 text-center whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 font-bold text-amber-400 text-xs bg-amber-400/10 px-2 py-0.5 rounded-full">
                         <Star className="w-3 h-3 fill-amber-400" />
                         {b.feedbackCount}
                       </span>
                     </td>
 
-                    <td className="py-4 px-4 text-center">
+                    <td className="py-4 px-4 text-center whitespace-nowrap">
                       <button
                         onClick={() => handleToggleStatus(b.id, b.paymentStatus)}
                         title="Clique para alternar (Ativo -> Cortesia -> Pendente)"
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
+                        className={`whitespace-nowrap text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
                           b.paymentStatus === "gift"
                             ? "bg-purple-500/10 text-purple-300 border-purple-500/30 hover:bg-purple-500/20"
                             : b.paymentStatus === "active"
@@ -510,7 +596,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       </button>
                     </td>
 
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-4 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
                         {/* Ver página pública */}
                         <Link
@@ -537,20 +623,20 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                 ))}
               </tbody>
             </table>
-
-            {filteredBusinesses.length === 0 && (
-              <div className="text-center py-12 text-slate-500">
-                Nenhum estabelecimento encontrado com os filtros selecionados.
-              </div>
-            )}
           </div>
+
+          {filteredBusinesses.length === 0 && (
+            <div className="text-center py-12 text-slate-500">
+              Nenhum estabelecimento encontrado com os filtros selecionados.
+            </div>
+          )}
         </div>
       </main>
 
       {/* Modal de Cadastro de Novo Cliente */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl p-5 sm:p-6 relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg"
@@ -591,7 +677,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
                     Endereço Curto (Slug) *
@@ -734,8 +820,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                   Cor da Marca do Cliente (Cabeçalho da Avaliação)
                 </label>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {["#2563eb", "#0d9488", "#e11d48", "#d97706", "#ea580c", "#7c3aed", "#0f172a"].map((c) => (
                       <button
                         key={c}

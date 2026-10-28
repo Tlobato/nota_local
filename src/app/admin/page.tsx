@@ -103,20 +103,20 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     <div className="flex flex-col min-h-screen">
       {/* Banner se o Thyago estiver inspecionando uma empresa pelo Super Admin */}
       {isSuperAdmin && (
-        <div className="bg-slate-900 border-b border-slate-800 text-slate-200 px-6 py-2.5 flex items-center justify-between text-xs sticky top-0 z-50">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-400" />
-            <span>
-              Você está visualizando o painel de:{" "}
+        <div className="bg-slate-900 border-b border-slate-800 text-slate-200 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs sticky top-0 z-50">
+          <div className="flex items-center gap-2 min-w-0">
+            <Shield className="w-4 h-4 text-blue-400 shrink-0" />
+            <span className="truncate">
+              Painel de:{" "}
               <strong className="text-white">{currentBusiness.name}</strong>
             </span>
           </div>
           <Link
             href="/super-admin"
-            className="flex items-center gap-1.5 font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20 transition-colors"
+            className="shrink-0 flex items-center gap-1.5 font-bold text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Voltar ao Super Admin
+            <span>Super Admin</span>
           </Link>
         </div>
       )}
