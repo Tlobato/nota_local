@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useAuth, UserButton } from "@clerk/nextjs";
 import {
   Star,
   ShieldCheck,
@@ -22,6 +23,7 @@ import confetti from "canvas-confetti";
 import Logo from "@/components/Logo";
 
 export default function LandingPage() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [demoRating, setDemoRating] = useState<number | null>(null);
   const [demoStep, setDemoStep] = useState<"choose" | "positive" | "negative">("choose");
 
@@ -49,23 +51,41 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/admin"
-              className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
-            >
-              Acessar Painel
-            </Link>
-            <Link
               href="/clinica-sorriso"
               className="hidden sm:inline-block text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
             >
               Ver Demo
             </Link>
-            <Link
-              href="/checkout"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all"
-            >
-              Ativar Meu Negócio
-            </Link>
+
+            {isLoaded && isSignedIn ? (
+              <>
+                <Link
+                  href="/admin"
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all flex items-center gap-1.5"
+                >
+                  <span>Acessar Meu Painel</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <div className="ml-1 flex items-center">
+                  <UserButton />
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/admin"
+                  className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/checkout"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all"
+                >
+                  Ativar Meu Negócio
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -92,21 +112,42 @@ export default function LandingPage() {
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="#simulador"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
-            >
-              <span>Testar Simulador na Prática</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            {isLoaded && isSignedIn ? (
+              <>
+                <Link
+                  href="/admin"
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Ir para o Meu Painel do Gestor</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
 
-            <Link
-              href="/admin"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-base border border-slate-700 transition-all flex items-center justify-center gap-2"
-            >
-              <span>Ver Painel de Gestão</span>
-              <ExternalLink className="w-4 h-4 text-slate-400" />
-            </Link>
+                <a
+                  href="#simulador"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-base border border-slate-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Testar Simulador</span>
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  href="#simulador"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Testar Simulador na Prática</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+
+                <Link
+                  href="/checkout"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Ativar Meu Negócio (R$ 490)</span>
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -248,26 +289,58 @@ export default function LandingPage() {
       {/* CTA Final */}
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-900 to-slate-950 text-center border-t border-slate-800">
         <div className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-3xl font-extrabold text-white">
-            Pronto para blindar a nota do seu negócio?
-          </h2>
-          <p className="text-sm text-slate-400">
-            Comece a multiplicar avaliações 5 estrelas hoje mesmo por apenas R$ 490 (em até 12x no cartão ou Pix).
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
-            <Link
-              href="/checkout"
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25"
-            >
-              Ativar Meu Estabelecimento
-            </Link>
-            <Link
-              href="/clinica-sorriso"
-              className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
-            >
-              Ver Demo ao Vivo
-            </Link>
-          </div>
+          {isLoaded && isSignedIn ? (
+            <>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-1">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Sua conta está ativa no NotaLocal</span>
+              </div>
+              <h2 className="text-3xl font-extrabold text-white">
+                Seu estabelecimento já está protegido!
+              </h2>
+              <p className="text-sm text-slate-400">
+                Acesse seu painel a qualquer momento para acompanhar as avaliações recebidas, baixar novas plaquinhas de balcão e gerenciar suas métricas.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <Link
+                  href="/admin"
+                  className="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
+                >
+                  <span>Acessar Meu Painel</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/clinica-sorriso"
+                  className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
+                >
+                  Ver Demo ao Vivo
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-3xl font-extrabold text-white">
+                Pronto para blindar a nota do seu negócio?
+              </h2>
+              <p className="text-sm text-slate-400">
+                Comece a multiplicar avaliações 5 estrelas hoje mesmo por apenas R$ 490 (em até 12x no cartão ou Pix).
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <Link
+                  href="/checkout"
+                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25"
+                >
+                  Ativar Meu Estabelecimento
+                </Link>
+                <Link
+                  href="/clinica-sorriso"
+                  className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
+                >
+                  Ver Demo ao Vivo
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

@@ -613,8 +613,11 @@ export default function AdminDashboard({
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800">
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <div>
-            <Logo variant="dark" showRatingBadge={false} />
+          <div
+            onClick={() => setActiveTab("overview")}
+            className="cursor-pointer"
+          >
+            <Logo variant="dark" showRatingBadge={false} href="/admin" />
             <span className="block text-[10px] text-blue-400 uppercase tracking-widest font-semibold mt-1 ml-11">
               Painel Gestor
             </span>
@@ -698,7 +701,17 @@ export default function AdminDashboard({
             rel="noopener noreferrer"
             className="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition-colors"
           >
-            <span className="truncate text-xs">Página Pública</span>
+            <span className="truncate text-xs">Página de Avaliação</span>
+            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+          </a>
+
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-colors"
+          >
+            <span className="truncate text-xs">Site do NotaLocal</span>
             <ExternalLink className="w-3.5 h-3.5 shrink-0" />
           </a>
         </div>
