@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
         googleReviewUrl: googleReviewUrl.trim(),
         notificationPhone: notificationPhone?.replace(/\D/g, "") || null,
         coverColor: coverColor || "#2563eb",
-        paymentStatus: "active",
+        paymentStatus: "trial",
       })
       .returning();
 

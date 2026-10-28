@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { businesses } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,14 +10,19 @@ export async function POST(req: NextRequest) {
     // Eventos de sucesso do Asaas: PAYMENT_RECEIVED ou PAYMENT_CONFIRMED
     if (event.event === "PAYMENT_RECEIVED" || event.event === "PAYMENT_CONFIRMED") {
       const paymentId = event.payment?.id;
+      const subscriptionId = event.payment?.subscription;
       const customerId = event.payment?.customer;
 
-      if (paymentId) {
-        // Atualiza status do pagamento da empresa correspondente
+      const conditions = [];
+      if (paymentId) conditions.push(eq(businesses.asaasPaymentId, paymentId));
+      if (subscriptionId) conditions.push(eq(businesses.asaasPaymentId, subscriptionId));
+      if (customerId) conditions.push(eq(businesses.asaasCustomerId, customerId));
+
+      if (conditions.length > 0) {
         await db
           .update(businesses)
-          .set({ paymentStatus: "active" })
-          .where(eq(businesses.asaasPaymentId, paymentId));
+          .set({ paymentStatus: "active", updatedAt: new Date() })
+          .where(or(...conditions));
       }
     }
 

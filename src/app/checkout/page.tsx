@@ -41,6 +41,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<"annual" | "monthly">("annual");
+  const [businessId, setBusinessId] = useState<string>("");
 
   const [form, setForm] = useState({
     name: "",
@@ -57,6 +58,17 @@ export default function CheckoutPage() {
       } else if (params.get("plan") === "annual") {
         setPlan("annual");
       }
+      const bId = params.get("businessId");
+      if (bId) setBusinessId(bId);
+      const preEmail = params.get("email");
+      const preName = params.get("name");
+      if (preEmail || preName) {
+        setForm((prev) => ({
+          ...prev,
+          email: preEmail || prev.email,
+          name: preName || prev.name,
+        }));
+      }
     }
   }, []);
 
@@ -69,7 +81,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, plan }),
+        body: JSON.stringify({ ...form, plan, businessId: businessId || undefined }),
       });
 
       const data = await res.json();

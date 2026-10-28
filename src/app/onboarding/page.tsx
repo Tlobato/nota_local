@@ -100,11 +100,15 @@ export default function OnboardingPage() {
         <div className="flex justify-center mb-4">
           <Logo variant="dark" showRatingBadge={false} />
         </div>
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-3">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>7 Dias de Teste Grátis • Sem precisar de cartão</span>
+        </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
           Configuração do seu Estabelecimento
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-400">
-          Leva menos de 2 minutos para colocar sua blindagem e QR Code no ar.
+          Leva menos de 2 minutos para colocar sua blindagem e QR Code no ar gratuitamente por 7 dias.
         </p>
       </div>
 
@@ -251,21 +255,24 @@ export default function OnboardingPage() {
             </div>
 
             {/* Botão de Finalização */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-2.5">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
-                  <span>Criando seu sistema...</span>
+                  <span>Liberando seus 7 dias grátis...</span>
                 ) : (
                   <>
-                    <span>Ativar Meu NotaLocal</span>
+                    <span>Iniciar Meus 7 Dias Grátis</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
+              <p className="text-[11px] text-center text-slate-400">
+                Acesso 100% liberado por 7 dias sem cobrança automática. Você só assina se gostar do resultado!
+              </p>
             </div>
           </form>
         </div>

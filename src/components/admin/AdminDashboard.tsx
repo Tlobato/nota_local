@@ -208,6 +208,22 @@ export default function AdminDashboard({
 
   const protectionRate = totalReviews > 0 ? Math.round((positiveReviews / totalReviews) * 100) : 100;
 
+  // Cálculo do Teste Grátis de 7 Dias e Bloqueio por Assinatura Pendente
+  const trialRefDate = new Date(currentBusiness.updatedAt || currentBusiness.createdAt);
+  const daysElapsed = Math.floor((Date.now() - trialRefDate.getTime()) / (1000 * 60 * 60 * 24));
+  const trialDaysLeft = Math.max(0, 7 - daysElapsed);
+  const isTrialActive =
+    !currentBusiness.isDemo && currentBusiness.paymentStatus === "trial" && daysElapsed < 7;
+  const isTrialExpired =
+    !currentBusiness.isDemo && currentBusiness.paymentStatus === "trial" && daysElapsed >= 7;
+  const isPaymentLocked =
+    !currentBusiness.isDemo &&
+    (currentBusiness.paymentStatus === "pending" || isTrialExpired);
+
+  const checkoutQueryBase = `businessId=${encodeURIComponent(currentBusiness.id)}&email=${encodeURIComponent(
+    currentBusiness.ownerEmail || ""
+  )}&name=${encodeURIComponent(currentBusiness.name)}`;
+
   const publicUrl = typeof window !== "undefined" ? `${window.location.origin}/${currentBusiness.slug}` : `/${currentBusiness.slug}`;
 
   // Render QR Code on canvas
@@ -783,6 +799,138 @@ export default function AdminDashboard({
 
       {/* Main Content Area */}
       <main className="flex-1 w-full min-w-0 p-4 sm:p-8 max-w-6xl overflow-x-hidden">
+        {/* Banner de Período de Teste Grátis (7 Dias) */}
+        {isTrialActive && (
+          <div className="mb-6 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border border-blue-500/30 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center shrink-0 text-amber-300">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs sm:text-sm font-extrabold text-white">
+                    Período de Teste Grátis Ativo
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[11px] font-bold">
+                    Restam {trialDaysLeft} {trialDaysLeft === 1 ? "dia" : "dias"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Aproveite todos os recursos! Para manter seu QR Code e sua página funcionando sem interrupção após o teste, ative seu plano definitivo:
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <a
+                href={`/checkout?plan=annual&${checkoutQueryBase}`}
+                className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5"
+              >
+                <span>Assinar Anual (12x R$ 29,90)</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={`/checkout?plan=monthly&${checkoutQueryBase}`}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-all"
+              >
+                Plano Mensal (R$ 49,90)
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Tela de Bloqueio / Paywall quando o Teste de 7 Dias expirou ou Status está Pendente */}
+        {isPaymentLocked ? (
+          <div className="max-w-3xl mx-auto my-6 bg-white rounded-3xl border-2 border-slate-200 shadow-2xl overflow-hidden animate-in fade-in duration-200">
+            <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 p-6 sm:p-8 text-white text-center space-y-3">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                <AlertCircle className="w-4 h-4" />
+                {isTrialExpired ? "Período de Teste de 7 Dias Encerrado" : "Assinatura Aguardando Ativação"}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold">
+                Ative seu plano para liberar o painel da {currentBusiness.name}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                Seus dados, histórico de avaliações e o endereço do seu QR Code (<strong>/{currentBusiness.slug}</strong>) estão salvos e seguros. Escolha abaixo o plano ideal para reativar imediatamente:
+              </p>
+            </div>
+
+            <div className="p-6 sm:p-8 space-y-6">
+              {/* Resumo das métricas já conquistadas pela empresa */}
+              <div className="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-center">
+                <div>
+                  <span className="text-xl sm:text-2xl font-extrabold text-slate-900">{totalReviews}</span>
+                  <p className="text-[11px] text-slate-500 font-medium">Interações Totais</p>
+                </div>
+                <div className="border-x border-slate-200">
+                  <span className="text-xl sm:text-2xl font-extrabold text-emerald-600">{positiveReviews}</span>
+                  <p className="text-[11px] text-slate-500 font-medium">Enviadas ao Google</p>
+                </div>
+                <div>
+                  <span className="text-xl sm:text-2xl font-extrabold text-amber-600">{retainedCritiques}</span>
+                  <p className="text-[11px] text-slate-500 font-medium">Críticas Retidas</p>
+                </div>
+              </div>
+
+              {/* Opções de Plano para Destravar */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Plano Anual */}
+                <div className="relative p-6 rounded-2xl border-2 border-blue-600 bg-blue-50/40 flex flex-col justify-between space-y-4">
+                  <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-extrabold uppercase">
+                    Mais Escolhido • 40% OFF
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-slate-900">Plano Anual</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      1 ano completo de proteção sem se preocupar com mensalidades.
+                    </p>
+                    <div className="mt-4 flex items-baseline gap-1.5">
+                      <span className="text-xs font-bold text-blue-700">12x de</span>
+                      <span className="text-3xl font-extrabold text-slate-900">R$ 29,90</span>
+                    </div>
+                    <p className="text-xs text-emerald-700 font-semibold mt-1">
+                      ou R$ 297,00 à vista no Pix
+                    </p>
+                  </div>
+
+                  <a
+                    href={`/checkout?plan=annual&${checkoutQueryBase}`}
+                    className="w-full py-3.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm text-center shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Ativar no Plano Anual</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                </div>
+
+                {/* Plano Mensal */}
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between space-y-4">
+                  <div>
+                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold mb-1">
+                      Sem Fidelidade
+                    </span>
+                    <h3 className="text-lg font-extrabold text-slate-900">Plano Mensal</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Renovação mês a mês via Pix ou Cartão. Cancele quando quiser.
+                    </p>
+                    <div className="mt-4 flex items-baseline gap-1.5">
+                      <span className="text-3xl font-extrabold text-slate-900">R$ 49,90</span>
+                      <span className="text-xs text-slate-500">/ mês</span>
+                    </div>
+                  </div>
+
+                  <a
+                    href={`/checkout?plan=monthly&${checkoutQueryBase}`}
+                    className="w-full py-3.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm text-center transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>Ativar no Plano Mensal</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* TAB 1: VISÃO GERAL */}
         {activeTab === "overview" && (
           <div className="space-y-8 animate-in fade-in duration-200">
@@ -1775,6 +1923,8 @@ export default function AdminDashboard({
               </div>
             </form>
           </div>
+        )}
+          </>
         )}
       </main>
 

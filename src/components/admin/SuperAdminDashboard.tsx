@@ -361,7 +361,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
   const handleToggleStatus = async (id: string, currentStatus: string | null) => {
     let nextStatus = "active";
-    if (currentStatus === "active") nextStatus = "gift";
+    if (currentStatus === "active") nextStatus = "trial";
+    else if (currentStatus === "trial") nextStatus = "gift";
     else if (currentStatus === "gift") nextStatus = "pending";
     else nextStatus = "active";
 
@@ -508,7 +509,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
     }
   };
 
-  // Converter um Prospecto do CRM diretamente em Cliente Ativo no NotaLocal!
+  // Converter um Prospecto do CRM diretamente em Cliente no NotaLocal!
   const handleConvertToClient = (p: Prospect) => {
     setForm({
       name: p.businessName,
@@ -519,7 +520,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
       ownerEmail: p.email || "",
       googleReviewUrl: p.googleUrl || "",
       notificationPhone: formatPhone(p.phone || ""),
-      paymentStatus: "active",
+      paymentStatus: "trial",
       coverColor: "#2563eb",
     });
     setIsModalOpen(true);
@@ -586,6 +587,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
 
     if (filterStatus === "all") return matchesSearch;
     if (filterStatus === "active") return matchesSearch && b.paymentStatus === "active";
+    if (filterStatus === "trial") return matchesSearch && b.paymentStatus === "trial";
     if (filterStatus === "gift") return matchesSearch && b.paymentStatus === "gift";
     if (filterStatus === "pending") return matchesSearch && b.paymentStatus === "pending";
     if (filterStatus === "demo") return matchesSearch && b.isDemo;
@@ -765,6 +767,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                   {[
                     { id: "all", label: "Todos" },
                     { id: "active", label: "Pagantes" },
+                    { id: "trial", label: "Teste 7d 🧪" },
                     { id: "gift", label: "Cortesias 🎁" },
                     { id: "pending", label: "Pendentes" },
                     { id: "demo", label: "Demonstração" },
@@ -814,6 +817,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                         className={`shrink-0 whitespace-nowrap text-[11px] font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
                           b.paymentStatus === "gift"
                             ? "bg-purple-500/10 text-purple-300 border-purple-500/30"
+                            : b.paymentStatus === "trial"
+                            ? "bg-blue-500/15 text-blue-300 border-blue-500/30"
                             : b.paymentStatus === "active"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : "bg-amber-500/10 text-amber-400 border-amber-500/20"
@@ -821,6 +826,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                       >
                         {b.paymentStatus === "gift"
                           ? "🎁 Cortesia"
+                          : b.paymentStatus === "trial"
+                          ? "🧪 Teste 7d"
                           : b.paymentStatus === "active"
                           ? "Ativo"
                           : "Pendente"}
@@ -937,10 +944,12 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                         <td className="py-4 px-4 text-center whitespace-nowrap">
                           <button
                             onClick={() => handleToggleStatus(b.id, b.paymentStatus)}
-                            title="Clique para alternar (Ativo -> Cortesia -> Pendente)"
+                            title="Clique para alternar (Ativo -> Teste 7d -> Cortesia -> Pendente)"
                             className={`whitespace-nowrap text-xs font-semibold px-2.5 py-1 rounded-full cursor-pointer transition-all border ${
                               b.paymentStatus === "gift"
                                 ? "bg-purple-500/10 text-purple-300 border-purple-500/30 hover:bg-purple-500/20"
+                                : b.paymentStatus === "trial"
+                                ? "bg-blue-500/15 text-blue-300 border-blue-500/30 hover:bg-blue-500/25"
                                 : b.paymentStatus === "active"
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
                                 : "bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20"
@@ -948,6 +957,8 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                           >
                             {b.paymentStatus === "gift"
                               ? "🎁 Cortesia"
+                              : b.paymentStatus === "trial"
+                              ? "🧪 Teste 7d"
                               : b.paymentStatus === "active"
                               ? "Ativo"
                               : "Pendente"}
@@ -1976,9 +1987,10 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     onChange={(e) => setForm({ ...form, paymentStatus: e.target.value })}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
                   >
-                    <option value="active">Ativo (Pagante — Anual R$ 297 / Mensal R$ 49,90)</option>
-                    <option value="gift">🎁 Cortesia / Amigo / Teste Grátis</option>
-                    <option value="pending">Pendente (Aguardando Pagamento)</option>
+                    <option value="trial">🧪 Teste Grátis de 7 Dias (Trava no 8º dia)</option>
+                    <option value="active">✅ Ativo (Pagante — Anual R$ 297 / Mensal R$ 49,90)</option>
+                    <option value="gift">🎁 Cortesia Vitalícia (Amigos / Parceiros)</option>
+                    <option value="pending">⏳ Pendente (Bloqueado aguardando pagamento)</option>
                   </select>
                 </div>
               </div>
