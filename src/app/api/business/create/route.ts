@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { businesses } from "@/lib/db/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,14 +28,40 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9-]/g, "-")
       .replace(/-+/g, "-");
 
-    // Verificar se o slug já existe
-    const existing = await db.query.businesses.findFirst({
+    const cleanGoogleUrl = googleReviewUrl.trim().replace(/\/+$/, "");
+    const cleanPhone = notificationPhone?.replace(/\D/g, "") || null;
+
+    // 1. Verificar se o slug já existe
+    const existingSlug = await db.query.businesses.findFirst({
       where: eq(businesses.slug, cleanSlug),
     });
 
-    if (existing) {
+    if (existingSlug) {
       return NextResponse.json(
         { error: "Este endereço (slug) já está em uso. Por favor, escolha outro." },
+        { status: 409 }
+      );
+    }
+
+    // 2. Trava Anti-Abuso dos 7 Dias Grátis: impedir recriação com outro e-mail usando o mesmo Link do Google ou mesmo WhatsApp
+    const duplicateConditions = [
+      eq(businesses.googleReviewUrl, cleanGoogleUrl),
+      eq(businesses.googleReviewUrl, `${cleanGoogleUrl}/`),
+    ];
+    if (cleanPhone && cleanPhone.length >= 10) {
+      duplicateConditions.push(eq(businesses.notificationPhone, cleanPhone));
+    }
+
+    const existingBusiness = await db.query.businesses.findFirst({
+      where: or(...duplicateConditions),
+    });
+
+    if (existingBusiness && !existingBusiness.isDemo) {
+      return NextResponse.json(
+        {
+          error:
+            "Este estabelecimento (Link do Google ou WhatsApp) já utilizou o período de teste gratuito de 7 dias. Faça login na sua conta original para ativar seu plano.",
+        },
         { status: 409 }
       );
     }
@@ -48,8 +74,8 @@ export async function POST(req: NextRequest) {
         name: name.trim(),
         slug: cleanSlug,
         category: category?.trim() || "Negócio Local",
-        googleReviewUrl: googleReviewUrl.trim(),
-        notificationPhone: notificationPhone?.replace(/\D/g, "") || null,
+        googleReviewUrl: cleanGoogleUrl,
+        notificationPhone: cleanPhone,
         coverColor: coverColor || "#2563eb",
         paymentStatus: "trial",
       })
