@@ -1,0 +1,41 @@
+<svg width="1180" height="320" viewBox="0 0 1180 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="300" x2="300" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="pinShadow" x="0" y="0" width="400" height="400" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0F172A" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Icon Group -->
+  <g transform="translate(30, 30)">
+    <rect x="0" y="0" width="260" height="260" rx="64" fill="url(#bgGrad)"/>
+    <rect x="3" y="3" width="254" height="254" rx="61" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="5"/>
+    <g filter="url(#pinShadow)" transform="translate(32, 28) scale(8.2)">
+      <path
+        d="M12 2C8.13401 2 5 5.13401 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13401 15.866 2 12 2Z"
+        fill="#1E3A8A"
+        fill-opacity="0.65"
+        stroke="#FFFFFF"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 5.8L13.1 8.1L15.6 8.4L13.8 10.1L14.2 12.6L12 11.4L9.8 12.6L10.2 10.1L8.4 8.4L10.9 8.1L12 5.8Z"
+        fill="#FBBF24"
+        stroke="#FCD34D"
+        stroke-width="0.8"
+        stroke-linejoin="round"
+      />
+    </g>
+  </g>
+
+  <!-- Brand Text: NotaLocal -->
+  <text x="340" y="210" font-family="Inter, Segoe UI, Arial, sans-serif" font-weight="900" font-size="154" letter-spacing="-4">
+    <tspan fill="#FFFFFF">Nota</tspan><tspan fill="#3B82F6">Local</tspan>
+  </text>
+</svg>
