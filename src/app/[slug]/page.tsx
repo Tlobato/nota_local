@@ -40,8 +40,8 @@ export default async function BusinessReviewPage({ params }: PageProps) {
     notFound();
   }
 
-  // Verifica se está bloqueado por pagamento pendente ou fim dos 7 dias de teste grátis
-  const refDate = new Date(business.updatedAt || business.createdAt);
+  // Verifica se está bloqueado por pagamento pendente ou fim dos 7 dias de teste grátis (usando relógio do servidor e createdAt imutável pelo cliente)
+  const refDate = new Date(business.createdAt);
   const daysElapsed = Math.floor((Date.now() - refDate.getTime()) / (1000 * 60 * 60 * 24));
   const isTrialExpired = business.paymentStatus === "trial" && daysElapsed >= 7;
   const isBlocked = !business.isDemo && (business.paymentStatus === "pending" || isTrialExpired);

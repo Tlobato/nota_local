@@ -58,12 +58,14 @@ interface AdminDashboardProps {
   initialBusiness: Business;
   initialFeedbacks: Feedback[];
   allBusinesses: Business[];
+  serverNowMs?: number;
 }
 
 export default function AdminDashboard({
   initialBusiness,
   initialFeedbacks,
   allBusinesses,
+  serverNowMs,
 }: AdminDashboardProps) {
   const [currentBusiness, setCurrentBusiness] = useState<Business>(initialBusiness);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(initialFeedbacks);
@@ -208,9 +210,10 @@ export default function AdminDashboard({
 
   const protectionRate = totalReviews > 0 ? Math.round((positiveReviews / totalReviews) * 100) : 100;
 
-  // Cálculo do Teste Grátis de 7 Dias e Bloqueio por Assinatura Pendente
-  const trialRefDate = new Date(currentBusiness.updatedAt || currentBusiness.createdAt);
-  const daysElapsed = Math.floor((Date.now() - trialRefDate.getTime()) / (1000 * 60 * 60 * 24));
+  // Cálculo do Teste Grátis de 7 Dias e Bloqueio por Assinatura Pendente (Blindado com hora do servidor e createdAt imutável pelo cliente)
+  const trialRefDate = new Date(currentBusiness.createdAt);
+  const referenceNow = serverNowMs || Date.now();
+  const daysElapsed = Math.floor((referenceNow - trialRefDate.getTime()) / (1000 * 60 * 60 * 24));
   const trialDaysLeft = Math.max(0, 7 - daysElapsed);
   const isTrialActive =
     !currentBusiness.isDemo && currentBusiness.paymentStatus === "trial" && daysElapsed < 7;

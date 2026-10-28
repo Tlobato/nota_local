@@ -125,6 +125,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         initialBusiness={currentBusiness}
         initialFeedbacks={allFeedbacks}
         allBusinesses={[currentBusiness]}
+        serverNowMs={Date.now()}
       />
     </div>
   );

@@ -94,9 +94,19 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "ID e paymentStatus são obrigatórios." }, { status: 400 });
     }
 
+    const updatePayload: Record<string, any> = {
+      paymentStatus,
+      updatedAt: new Date(),
+    };
+
+    // Se o Super Admin mudou manualmente para Teste 7d, reinicia a contagem de 7 dias no relógio do servidor
+    if (paymentStatus === "trial") {
+      updatePayload.createdAt = new Date();
+    }
+
     const [updated] = await db
       .update(businesses)
-      .set({ paymentStatus, updatedAt: new Date() })
+      .set(updatePayload)
       .where(eq(businesses.id, id))
       .returning();
 
