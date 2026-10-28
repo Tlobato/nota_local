@@ -512,12 +512,13 @@ export default function AdminDashboard({
               {feedbacks
                 .filter((f) => !f.redirectedToGoogle)
                 .map((f) => {
-                  const hasPhone = Boolean(f.customerPhone);
-                  const cleanPhone = f.customerPhone ? f.customerPhone.replace(/\D/g, "") : "";
+                  const hasName = Boolean(f.customerName && f.customerName.trim());
+                  const hasPhone = Boolean(f.customerPhone && f.customerPhone.trim());
+                  const cleanPhone = hasPhone ? f.customerPhone!.replace(/\D/g, "") : "";
                   const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
                   const quickGreetUrl = hasPhone
                     ? `https://wa.me/${formattedPhone}?text=${encodeURIComponent(
-                        `Olá ${f.customerName || ""}! Tudo bem?\n\nAqui é o atendimento da ${currentBusiness.name}. Vimos seu recado e fizemos questão de entrar em contato pessoalmente. Sentimos muito pela sua experiência e gostaríamos de entender exatamente para solucionar para você!`
+                        `Olá ${hasName ? f.customerName : ""}! Tudo bem?\n\nAqui é o atendimento da ${currentBusiness.name}. Vimos seu recado e fizemos questão de entrar em contato pessoalmente. Sentimos muito pela sua experiência e gostaríamos de entender exatamente para solucionar para você!`
                       )}`
                     : null;
 
@@ -584,18 +585,22 @@ export default function AdminDashboard({
                         </div>
                       </div>
 
-                      {/* Informações do Cliente */}
+                      {/* Informações do Cliente com Tags Contextuais */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="text-sm font-bold text-slate-900 flex flex-wrap items-center gap-2">
-                          <span>{f.customerName || "Cliente anônimo"}</span>
+                          <span>{hasName ? f.customerName : "Cliente sem nome informado"}</span>
                           {hasPhone ? (
                             <span className="font-mono text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200/60 flex items-center gap-1 font-semibold">
                               <Phone className="w-3 h-3 text-emerald-600" />
                               {f.customerPhone}
                             </span>
+                          ) : hasName ? (
+                            <span className="text-xs text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-md font-medium">
+                              Telefone não informado
+                            </span>
                           ) : (
-                            <span className="text-xs text-slate-400 italic font-normal bg-slate-100 px-2.5 py-0.5 rounded-md">
-                              Telefone não informado (avaliação anônima)
+                            <span className="text-xs text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md font-medium">
+                              Avaliação 100% anônima
                             </span>
                           )}
                         </div>
@@ -606,7 +611,7 @@ export default function AdminDashboard({
                         &quot;{f.comment || "Nenhum comentário por escrito deixado pelo cliente."}&quot;
                       </div>
 
-                      {/* Ações Inteligentes: Apoio ao Dono */}
+                      {/* Ações Inteligentes: Apoio Contextual ao Dono */}
                       <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         {hasPhone ? (
                           <div className="flex flex-wrap items-center gap-2">
@@ -629,13 +634,23 @@ export default function AdminDashboard({
                               <span>Guia & Scripts de Reversão para 5⭐</span>
                             </button>
                           </div>
+                        ) : hasName ? (
+                          <div className="flex items-start gap-2.5 bg-blue-50/70 border border-blue-200/60 p-3 rounded-xl text-xs text-blue-900 flex-1">
+                            <Lightbulb className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="block font-semibold">Cliente identificado pelo nome ({f.customerName}):</strong>
+                              <span>
+                                Embora o cliente não tenha digitado o WhatsApp, você sabe quem ele é! Verifique no seu cadastro interno ou sistema quem é o(a) {f.customerName}. Se tiver o contato em seus registros, vale a pena ligar ou mandar mensagem para solucionar.
+                              </span>
+                            </div>
+                          </div>
                         ) : (
                           <div className="flex items-start gap-2.5 bg-amber-50/70 border border-amber-200/60 p-3 rounded-xl text-xs text-amber-900 flex-1">
                             <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                             <div>
-                              <strong className="block font-semibold">Como agir neste caso (Sem telefone):</strong>
+                              <strong className="block font-semibold">Como agir (Feedback 100% Anônimo):</strong>
                               <span>
-                                Como o cliente optou por não informar contato, use este relato para alinhar com sua equipe sobre o ponto citado e prevenir que novos clientes sintam a mesma insatisfação.
+                                Como o cliente optou por não se identificar nem deixar contato, use este relato para alinhamento interno da equipe e melhoria contínua dos processos da loja.
                               </span>
                             </div>
                           </div>
