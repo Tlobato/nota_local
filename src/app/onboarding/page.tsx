@@ -114,6 +114,16 @@ export default function OnboardingPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-xl">
         <div className="bg-white text-slate-900 py-8 px-6 sm:px-10 rounded-3xl shadow-2xl border border-slate-100">
+          {/* Aviso de Confiança Sem Cartão */}
+          <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+              ✓
+            </div>
+            <div className="text-xs text-emerald-950 leading-relaxed">
+              <strong className="font-extrabold">Zero dados financeiros:</strong> Não pedimos cartão de crédito, CPF nem dados bancários para liberar seus 7 dias grátis. Não há cobrança automática no final do teste.
+            </div>
+          </div>
+
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
               {error}
@@ -208,10 +218,11 @@ export default function OnboardingPage() {
             {/* WhatsApp para Alerta de Crise */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                WhatsApp do Gerente / Responsável (com DDD)
+                WhatsApp do Responsável (com DDD)
               </label>
               <input
                 type="tel"
+                required
                 placeholder="(11) 99999-9999"
                 value={form.notificationPhone}
                 onChange={(e) =>
@@ -220,7 +231,7 @@ export default function OnboardingPage() {
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                Número de contato do responsável. Os alertas de críticas retidas são enviados para o seu e-mail de cadastro e exibidos na Ouvidoria.
+                Usado para suporte na ativação da sua placa e avisos do seu painel.
               </p>
             </div>
 

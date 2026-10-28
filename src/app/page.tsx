@@ -173,10 +173,20 @@ export default function LandingPage() {
           </div>
 
           {!(isLoaded && isSignedIn) && (
-            <p className="text-xs text-slate-400 flex items-center justify-center gap-2 pt-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>Sem precisar de cartão de crédito • Seu QR Code pronto em 2 minutos</span>
-            </p>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-medium text-slate-300">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Não pedimos cartão nem dados bancários</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Zero cobrança automática após os 7 dias</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Placa e QR Code prontos em 2 minutos</span>
+              </span>
+            </div>
           )}
         </div>
       </section>
@@ -523,15 +533,23 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
-                <Link
-                  href="/onboarding"
-                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 transition-all"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Gerar Meu QR Code e Placa Grátis (7 Dias)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+              <div className="pt-2 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <Link
+                    href="/onboarding"
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>Gerar Meu QR Code e Placa Grátis (7 Dias)</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong className="text-slate-200">Sem pegadinha:</strong> não pedimos cartão de crédito, CPF ou qualquer dado financeiro para liberar seu teste.
+                  </span>
+                </p>
               </div>
             </div>
           </div>
@@ -588,10 +606,10 @@ export default function LandingPage() {
       {!(isLoaded && isSignedIn) && (
         <section id="planos" className="py-20 px-4 sm:px-6 bg-slate-950/80 border-t border-slate-800">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14 space-y-3">
+            <div className="text-center mb-12 space-y-3">
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5" />
-                7 Dias Grátis para Testar • Sem Cartão na Entrada
+                7 Dias Grátis para Testar • Zero Dados Financeiros na Entrada
               </span>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
                 Quanto vale impedir 1 crítica injusta no seu Google?
@@ -599,6 +617,18 @@ export default function LandingPage() {
               <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
                 Você pode usar o NotaLocal gratuitamente por <strong>7 dias</strong> para ver o filtro funcionando no seu próprio balcão ou WhatsApp. Depois do teste, escolha o plano ideal:
               </p>
+
+              {/* Selo Anti-Desconfiança */}
+              <div className="max-w-2xl mx-auto pt-2">
+                <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-4 py-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs sm:text-sm text-emerald-200">
+                  <span className="font-extrabold text-emerald-400 shrink-0">
+                    🔒 Teste 100% Sem Compromisso:
+                  </span>
+                  <span>
+                    Não pedimos cartão de crédito nem dados bancários agora. Não existe cobrança automática ao fim dos 7 dias.
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
