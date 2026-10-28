@@ -82,6 +82,7 @@ export default function SuperAdminDashboard({
     googleReviewUrl: "",
     notificationPhone: "",
     paymentStatus: "active",
+    coverColor: "#2563eb",
   });
 
   // Categorias predefinidas completas
@@ -235,6 +236,7 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
         googleReviewUrl: "",
         notificationPhone: "",
         paymentStatus: "active",
+        coverColor: "#2563eb",
       });
     } catch (err: any) {
       setFormError(err.message || "Erro inesperado.");
@@ -725,6 +727,37 @@ Já deixei os seus QR Codes gerados e a blindagem ativada. Qualquer dúvida esto
                     <option value="gift">🎁 Cortesia / Amigo / Teste Grátis</option>
                     <option value="pending">Pendente (Aguardando Pagamento)</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Cor da Marca do Cliente (Cabeçalho da Avaliação)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    {["#2563eb", "#0d9488", "#e11d48", "#d97706", "#ea580c", "#7c3aed", "#0f172a"].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setForm({ ...form, coverColor: c })}
+                        className={`w-6 h-6 rounded-full border-2 transition-transform cursor-pointer ${
+                          form.coverColor === c ? "border-white scale-110 shadow-sm" : "border-transparent opacity-80 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                  <input
+                    type="color"
+                    value={form.coverColor}
+                    onChange={(e) => setForm({ ...form, coverColor: e.target.value })}
+                    className="w-7 h-7 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer p-0.5"
+                    title="Outra cor personalizada"
+                  />
+                  <span className="text-xs font-mono text-slate-400">
+                    {form.coverColor}
+                  </span>
                 </div>
               </div>
 

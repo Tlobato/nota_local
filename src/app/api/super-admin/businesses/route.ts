@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
         googleReviewUrl: googleReviewUrl.trim(),
         notificationPhone: notificationPhone?.replace(/\D/g, "") || null,
         paymentStatus: paymentStatus || "active",
+        coverColor: body.coverColor || "#2563eb",
         isDemo: false,
       })
       .returning();

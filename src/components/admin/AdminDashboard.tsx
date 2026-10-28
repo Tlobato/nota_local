@@ -32,6 +32,17 @@ import type { Business, Feedback } from "@/lib/db/schema";
 import QRCodeLib from "qrcode";
 import Logo from "@/components/Logo";
 
+const COLOR_PRESETS = [
+  { name: "Azul Royal (Clínicas e Serviços)", hex: "#2563eb" },
+  { name: "Verde Esmeralda (Saúde e Odonto)", hex: "#0d9488" },
+  { name: "Rosa / Bordô (Confeitaria e Beleza)", hex: "#e11d48" },
+  { name: "Âmbar / Dourado (Cafés e Artesanal)", hex: "#d97706" },
+  { name: "Laranja Vibrante (Restaurantes e Alimentos)", hex: "#ea580c" },
+  { name: "Violeta (Estética e Salões)", hex: "#7c3aed" },
+  { name: "Chumbo / Preto (Barbearias e Oficinas)", hex: "#0f172a" },
+  { name: "Índigo Profundo (Corporativo e Tech)", hex: "#4f46e5" },
+];
+
 interface AdminDashboardProps {
   initialBusiness: Business;
   initialFeedbacks: Feedback[];
@@ -1607,6 +1618,65 @@ export default function AdminDashboard({
                   onChange={(e) => setSettingsForm({ ...settingsForm, welcomeMessage: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Cor Principal da Marca (Identidade Visual)
+                </label>
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {COLOR_PRESETS.map((color) => (
+                    <button
+                      key={color.hex}
+                      type="button"
+                      title={color.name}
+                      onClick={() => setSettingsForm({ ...settingsForm, coverColor: color.hex })}
+                      className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer flex items-center justify-center ${
+                        settingsForm.coverColor === color.hex
+                          ? "border-slate-900 scale-110 shadow-sm ring-2 ring-blue-500/30"
+                          : "border-white hover:scale-105"
+                      }`}
+                      style={{ backgroundColor: color.hex }}
+                    >
+                      {settingsForm.coverColor === color.hex && (
+                        <Check className="w-4 h-4 text-white drop-shadow" />
+                      )}
+                    </button>
+                  ))}
+
+                  <div className="flex items-center gap-2 ml-1">
+                    <input
+                      type="color"
+                      value={settingsForm.coverColor}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, coverColor: e.target.value })}
+                      className="w-8 h-8 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white"
+                      title="Escolher cor personalizada"
+                    />
+                    <span className="text-xs font-mono text-slate-500">
+                      {settingsForm.coverColor}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Prévia Instantânea do Cabeçalho */}
+                <div
+                  className="p-4 rounded-2xl text-white flex items-center justify-between shadow-xs transition-colors"
+                  style={{
+                    background: `linear-gradient(135deg, ${settingsForm.coverColor || "#2563eb"} 0%, #1e293b 100%)`,
+                  }}
+                >
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-white/70 block">
+                      {settingsForm.category || "Prévia do Cabeçalho"}
+                    </span>
+                    <strong className="text-base font-bold">
+                      {settingsForm.name || currentBusiness.name}
+                    </strong>
+                  </div>
+                  <span className="text-[10px] bg-white/10 px-2.5 py-1 rounded-full border border-white/20">
+                    Canal Oficial
+                  </span>
+                </div>
               </div>
 
               <div className="pt-2">
