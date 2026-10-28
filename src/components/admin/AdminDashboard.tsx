@@ -25,6 +25,8 @@ import {
   X,
   Lightbulb,
   RefreshCw,
+  Printer,
+  SlidersHorizontal,
 } from "lucide-react";
 import type { Business, Feedback } from "@/lib/db/schema";
 import QRCodeLib from "qrcode";
@@ -49,9 +51,19 @@ export default function AdminDashboard({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Customização do Display / Plaquinha de Balcão
+  const [displayHeadline, setDisplayHeadline] = useState("Sua opinião vale muito para nós!");
+  const [displaySubheadline, setDisplaySubheadline] = useState(
+    "Aponte a câmera do seu celular para o QR Code abaixo e nos avalie em 30 segundos:"
+  );
+  const [showDisplaySettings, setShowDisplaySettings] = useState(false);
+  const [downloadingPlate, setDownloadingPlate] = useState(false);
+
   // WhatsApp quick dispatch state
   const [dispatchName, setDispatchName] = useState("");
   const [dispatchPhone, setDispatchPhone] = useState("");
+  const [dispatchTone, setDispatchTone] = useState<"standard" | "casual" | "post_sale" | "custom">("standard");
+  const [customMessage, setCustomMessage] = useState("");
 
   // Business settings form
   const [settingsForm, setSettingsForm] = useState({
@@ -243,16 +255,338 @@ export default function AdminDashboard({
     }
   };
 
+  // Phone input masking helper
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+    let masked = raw;
+    if (raw.length > 0) {
+      if (raw.length <= 2) {
+        masked = `(${raw}`;
+      } else if (raw.length <= 6) {
+        masked = `(${raw.slice(0, 2)}) ${raw.slice(2)}`;
+      } else if (raw.length <= 10) {
+        masked = `(${raw.slice(0, 2)}) ${raw.slice(2, 6)}-${raw.slice(6)}`;
+      } else {
+        masked = `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7, 11)}`;
+      }
+    }
+    setDispatchPhone(masked);
+  };
+
+  // Get WhatsApp message based on selected tone
+  const getDispatchMessage = () => {
+    const nome = dispatchName.trim() || "[Nome do Cliente]";
+    const empresa = currentBusiness.name;
+    const link = publicUrl;
+
+    if (dispatchTone === "standard") {
+      return `Olá ${nome}! Aqui é da equipe da ${empresa}.\n\nFoi um prazer atender você! Poderia nos avaliar rapidamente no link abaixo? Leva apenas 30 segundos e nos ajuda muito:\n${link}`;
+    } else if (dispatchTone === "casual") {
+      return `Oi ${nome}, tudo bem?\n\nPassando para agradecer pela sua preferência hoje! Se puder contar como foi sua experiência, vai fazer nosso dia:\n${link}`;
+    } else if (dispatchTone === "post_sale") {
+      return `Olá ${nome}! Esperamos que tenha gostado do seu pedido/atendimento na ${empresa}!\n\nConte pra gente como foi sua experiência no link:\n${link}`;
+    } else {
+      return customMessage || `Olá ${nome}! Aqui é da equipe da ${empresa}. Foi um prazer atender você! Poderia nos avaliar no link?\n${link}`;
+    }
+  };
+
   // Dispatch WhatsApp link builder
   const quickDispatchUrl = () => {
     const cleanPhone = dispatchPhone.replace(/\D/g, "");
     const formattedPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
-    const message = encodeURIComponent(
-      `Olá ${dispatchName.trim() || "tudo bem?"}! Aqui é da equipe da ${currentBusiness.name}.\n\n` +
-        `Foi um prazer atender você! Poderia nos avaliar rapidamente no link abaixo? Leva apenas 10 segundos e nos ajuda muito:\n` +
-        `${publicUrl}`
-    );
-    return `https://wa.me/${formattedPhone}?text=${message}`;
+    return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(getDispatchMessage())}`;
+  };
+
+  // Imprimir Display de Mesa formatado para Acrílico A5 / 10x15cm
+  const handlePrintDisplay = () => {
+    if (!canvasRef.current) return;
+    const qrDataUrl = canvasRef.current.toDataURL("image/png");
+    const printWindow = window.open("", "_blank", "width=850,height=950");
+    if (!printWindow) {
+      alert("Por favor, permita pop-ups no seu navegador para imprimir a plaquinha.");
+      return;
+    }
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+        <head>
+          <meta charset="utf-8" />
+          <title>Display de Balcão - ${currentBusiness.name}</title>
+          <style>
+            @page {
+              size: A5 portrait;
+              margin: 8mm;
+            }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+              margin: 0;
+              padding: 16px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              background: #fff;
+              color: #0f172a;
+            }
+            .plate-container {
+              width: 100%;
+              max-width: 440px;
+              border: 3px solid #cbd5e1;
+              border-radius: 28px;
+              padding: 40px 32px 32px 32px;
+              text-align: center;
+              background: #ffffff;
+            }
+            .accent-bar {
+              width: 80px;
+              height: 5px;
+              background: ${currentBusiness.coverColor || "#2563eb"};
+              border-radius: 999px;
+              margin: 0 auto 16px auto;
+            }
+            .stars {
+              color: #f59e0b;
+              font-size: 28px;
+              letter-spacing: 5px;
+              margin-bottom: 12px;
+            }
+            .business-name {
+              font-size: 22px;
+              font-weight: 800;
+              color: #1e293b;
+              margin-bottom: 12px;
+              letter-spacing: -0.5px;
+            }
+            .headline {
+              font-size: 19px;
+              font-weight: 700;
+              color: #0f172a;
+              margin-bottom: 10px;
+              line-height: 1.35;
+            }
+            .subheadline {
+              font-size: 13px;
+              color: #64748b;
+              margin-bottom: 24px;
+              line-height: 1.45;
+              max-width: 340px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .qr-wrapper {
+              background: #f8fafc;
+              border: 2px solid #e2e8f0;
+              border-radius: 20px;
+              padding: 16px;
+              display: inline-block;
+              margin-bottom: 22px;
+            }
+            .qr-img {
+              width: 230px;
+              height: 230px;
+              display: block;
+            }
+            .badge {
+              display: inline-block;
+              background: #eff6ff;
+              border: 1px solid #bfdbfe;
+              padding: 6px 18px;
+              border-radius: 9999px;
+              font-size: 12px;
+              font-weight: 700;
+              color: #1d4ed8;
+              margin-bottom: 8px;
+            }
+            .url-hint {
+              font-size: 11px;
+              color: #94a3b8;
+              font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="plate-container">
+            <div class="accent-bar"></div>
+            <div class="stars">★★★★★</div>
+            <div class="business-name">${currentBusiness.name}</div>
+            <div class="headline">${displayHeadline}</div>
+            <div class="subheadline">${displaySubheadline}</div>
+            <div class="qr-wrapper">
+              <img class="qr-img" src="${qrDataUrl}" alt="QR Code de Avaliação" />
+            </div>
+            <div>
+              <div class="badge">⚡ Leva menos de 30 segundos • Avaliação Segura</div>
+              <div class="url-hint">${publicUrl}</div>
+            </div>
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 300);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  // Gerar PNG em Alta Resolução da Placa Completa (300 DPI - 1200x1650px)
+  const downloadDisplayPlate = async () => {
+    setDownloadingPlate(true);
+    try {
+      const canvas = document.createElement("canvas");
+      const width = 1200;
+      const height = 1650;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Fundo Branco
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+
+      // Moldura Arredondada
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.roundRect(40, 40, width - 80, height - 80, 48);
+      ctx.stroke();
+
+      // Barra superior decorativa
+      ctx.fillStyle = currentBusiness.coverColor || "#2563eb";
+      ctx.beginPath();
+      ctx.roundRect(width / 2 - 120, 60, 240, 14, 7);
+      ctx.fill();
+
+      // 5 Estrelas Douradas
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = "bold 60px system-ui, -apple-system, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("★ ★ ★ ★ ★", width / 2, 175);
+
+      // Nome da Empresa
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "bold 58px system-ui, -apple-system, sans-serif";
+      ctx.fillText(currentBusiness.name, width / 2, 265);
+
+      // Função de quebra de linhas para canvas
+      const drawWrappedText = (
+        text: string,
+        x: number,
+        startY: number,
+        maxWidth: number,
+        lineHeight: number,
+        font: string,
+        color: string
+      ): number => {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        const words = text.split(" ");
+        let line = "";
+        let y = startY;
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line + words[i] + " ";
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && i > 0) {
+            ctx.fillText(line.trim(), x, y);
+            line = words[i] + " ";
+            y += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line.trim(), x, y);
+        return y + lineHeight;
+      };
+
+      // Título Principal
+      let nextY = drawWrappedText(
+        displayHeadline,
+        width / 2,
+        370,
+        width - 240,
+        66,
+        "bold 46px system-ui, -apple-system, sans-serif",
+        "#0f172a"
+      );
+
+      // Subtítulo
+      nextY = drawWrappedText(
+        displaySubheadline,
+        width / 2,
+        nextY + 15,
+        width - 260,
+        48,
+        "32px system-ui, -apple-system, sans-serif",
+        "#64748b"
+      );
+
+      // Gerar QR Code em Alta Resolução
+      const qrDataUrl = await QRCodeLib.toDataURL(publicUrl, {
+        width: 650,
+        margin: 2,
+        color: { dark: "#0f172a", light: "#ffffff" },
+      });
+
+      const qrImg = new Image();
+      await new Promise((resolve) => {
+        qrImg.onload = resolve;
+        qrImg.src = qrDataUrl;
+      });
+
+      const qrBoxSize = 650;
+      const qrBoxX = (width - qrBoxSize) / 2;
+      const qrBoxY = Math.max(nextY + 30, 680);
+
+      // Caixa do QR Code
+      ctx.fillStyle = "#f8fafc";
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.roundRect(qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 40);
+      ctx.fill();
+      ctx.stroke();
+
+      // Desenhar Imagem do QR Code
+      const qrDrawSize = 570;
+      const qrDrawX = (width - qrDrawSize) / 2;
+      const qrDrawY = qrBoxY + (qrBoxSize - qrDrawSize) / 2;
+      ctx.drawImage(qrImg, qrDrawX, qrDrawY, qrDrawSize, qrDrawSize);
+
+      // Badge inferior
+      const pillY = qrBoxY + qrBoxSize + 60;
+      ctx.fillStyle = "#eff6ff";
+      ctx.strokeStyle = "#bfdbfe";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(width / 2 - 390, pillY, 780, 72, 36);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#1d4ed8";
+      ctx.font = "bold 29px system-ui, -apple-system, sans-serif";
+      ctx.fillText("⚡ Leva menos de 30 segundos • Avaliação Segura", width / 2, pillY + 46);
+
+      // URL no rodapé
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "26px monospace";
+      ctx.fillText(publicUrl, width / 2, pillY + 130);
+
+      // Download da imagem
+      const link = document.createElement("a");
+      link.download = `display-balcao-${currentBusiness.slug}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Erro ao gerar placa:", err);
+      alert("Não foi possível gerar a placa. Tente novamente.");
+    } finally {
+      setDownloadingPlate(false);
+    }
   };
 
   return (
@@ -741,113 +1075,337 @@ export default function AdminDashboard({
                 QR Code & Disparo Rápido
               </h2>
               <p className="text-sm text-slate-500 mt-1">
-                Utilize o QR Code físico no balcão da sua empresa ou envie convites em 1 clique pelo WhatsApp.
+                Utilize o Display de Balcão físico no caixa ou envie convites personalizados em 1 clique pelo WhatsApp.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Card 1: QR Code Oficial */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                  Display de Balcão
-                </span>
-                <h3 className="text-base font-bold text-slate-800 mb-4">
-                  QR Code Oficial da {currentBusiness.name}
-                </h3>
-
-                {/* Canvas do QR Code */}
-                <div className="p-3 bg-white rounded-2xl border-2 border-slate-100 shadow-inner mb-4">
-                  <canvas ref={canvasRef} className="rounded-lg" />
-                </div>
-
-                <div className="w-full flex items-center gap-2 mb-4">
-                  <input
-                    type="text"
-                    readOnly
-                    value={publicUrl}
-                    className="flex-1 px-3 py-2 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 truncate"
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {/* Card 1: Display de Balcão Profissional (Acrílico / Mesa) */}
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-200/60 inline-block mb-1">
+                      Display de Balcão & Mesa
+                    </span>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Placa Oficial para Impressão
+                    </h3>
+                  </div>
                   <button
-                    onClick={copyToClipboard}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    type="button"
+                    onClick={() => setShowDisplaySettings(!showDisplaySettings)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto"
                   >
-                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedLink ? "Copiado!" : "Copiar"}</span>
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                    <span>{showDisplaySettings ? "Ocultar Ajustes" : "Personalizar Textos"}</span>
                   </button>
                 </div>
 
-                <button
-                  onClick={downloadQrCode}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors shadow-md shadow-blue-500/20"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Baixar Imagem em Alta Resolução (PNG)</span>
-                </button>
-              </div>
-
-              {/* Card 2: Disparo 1-Clique WhatsApp (Sem Risco de Ban e Sem API) */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                <div>
-                  <span className="inline-block bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full mb-2 border border-emerald-200">
-                    ⚡ Disparo de Alta Conversão
-                  </span>
-                  <h3 className="text-base font-bold text-slate-800 mb-1">
-                    Enviar Convite no WhatsApp da Recepcionista
-                  </h3>
-                  <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-                    A recepcionista só digita o nome e o número do cliente que acabou de ser atendido. Ao clicar, o WhatsApp abre automaticamente com a mensagem e o link prontos.
-                  </p>
-
-                  <div className="space-y-3">
+                {/* Painel de Personalização de Textos (Opcional / Expansível) */}
+                {showDisplaySettings && (
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3 animate-in fade-in duration-150 text-xs">
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">
-                        Nome do Cliente
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Título Principal da Plaquinha:
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Carlos Oliveira"
-                        value={dispatchName}
-                        onChange={(e) => setDispatchName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        value={displayHeadline}
+                        onChange={(e) => setDisplayHeadline(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setDisplayHeadline("Sua opinião vale muito para nós!")}
+                          className="px-2 py-0.5 bg-white border border-slate-200 hover:border-slate-300 rounded text-[11px] text-slate-600"
+                        >
+                          Sua opinião vale muito
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDisplayHeadline("Como foi sua experiência hoje?")}
+                          className="px-2 py-0.5 bg-white border border-slate-200 hover:border-slate-300 rounded text-[11px] text-slate-600"
+                        >
+                          Como foi sua experiência
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDisplayHeadline("Adorou nosso atendimento?")}
+                          className="px-2 py-0.5 bg-white border border-slate-200 hover:border-slate-300 rounded text-[11px] text-slate-600"
+                        >
+                          Adorou nosso atendimento
+                        </button>
+                      </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">
-                        WhatsApp do Cliente (com DDD)
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Subtítulo / Chamada para Ação:
                       </label>
                       <input
-                        type="tel"
-                        placeholder="Ex: 15998383997"
-                        value={dispatchPhone}
-                        onChange={(e) => setDispatchPhone(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        type="text"
+                        value={displaySubheadline}
+                        onChange={(e) => setDisplaySubheadline(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                       />
                     </div>
+                  </div>
+                )}
 
-                    {/* Preview da Mensagem */}
-                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-600">
-                      <p className="font-semibold text-slate-700 mb-0.5">Mensagem que será enviada:</p>
-                      <p className="italic">
-                        "Olá {dispatchName || "[Nome]"}! Aqui é da equipe da {currentBusiness.name}. Foi um prazer atender você! Poderia nos avaliar rapidamente? {publicUrl}"
+                {/* Mockup / Preview Físico do Display de Balcão (Acrílico) */}
+                <div className="relative mx-auto w-full max-w-[340px] bg-gradient-to-b from-slate-100 to-slate-200/70 p-4 rounded-3xl border border-slate-200 shadow-md">
+                  {/* Placa propriamente dita */}
+                  <div className="bg-white rounded-2xl border-2 border-slate-200/90 p-6 text-center shadow-lg space-y-3 relative overflow-hidden">
+                    {/* Linha decorativa da cor da marca */}
+                    <div
+                      className="w-16 h-1.5 mx-auto rounded-full"
+                      style={{ backgroundColor: currentBusiness.coverColor || "#2563eb" }}
+                    />
+
+                    {/* 5 Estrelas Douradas */}
+                    <div className="flex items-center justify-center gap-1 text-amber-400">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+
+                    {/* Nome da Empresa */}
+                    <h4 className="text-base font-extrabold text-slate-800 tracking-tight">
+                      {currentBusiness.name}
+                    </h4>
+
+                    {/* Chamadas configuráveis */}
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 leading-snug">
+                        {displayHeadline}
                       </p>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed max-w-[240px] mx-auto">
+                        {displaySubheadline}
+                      </p>
+                    </div>
+
+                    {/* Canvas do QR Code Embutido */}
+                    <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-100 inline-block shadow-inner">
+                      <canvas ref={canvasRef} className="rounded-lg w-44 h-44 mx-auto" />
+                    </div>
+
+                    {/* Selo de Rapidez e Segurança */}
+                    <div className="pt-1">
+                      <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-200/60">
+                        ⚡ Leva menos de 30 segundos
+                      </span>
+                      <p className="text-[9px] text-slate-400 font-mono mt-1 truncate">
+                        {publicUrl}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Pé do Display (simulando suporte acrílico L de balcão) */}
+                  <div className="w-3/4 mx-auto h-2.5 bg-slate-300 rounded-b-xl shadow-inner mt-1"></div>
+                </div>
+
+                {/* Botões de Ação para o Lojista */}
+                <div className="space-y-2.5 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={handlePrintDisplay}
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-500/20 cursor-pointer"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>Imprimir Placa (A5/Mesa)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={downloadDisplayPlate}
+                      disabled={downloadingPlate}
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>{downloadingPlate ? "Gerando..." : "Baixar Placa Completa (PNG)"}</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={downloadQrCode}
+                      className="text-xs text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer py-1"
+                    >
+                      Baixar apenas o QR Code (.png)
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={copyToClipboard}
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        {copiedLink ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedLink ? "Link Copiado!" : "Copiar Link"}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Convite Direto via WhatsApp (Disparo Rápido para Cliente) */}
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-6">
+                <div>
+                  <div className="border-b border-slate-100 pb-4">
+                    <span className="inline-block bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-md mb-1 border border-emerald-200">
+                      ⚡ Disparo Rápido para Cliente
+                    </span>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      Convite Direto via WhatsApp
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Envie um convite amigável logo após a compra ou atendimento. O WhatsApp abre no seu aparelho com a mensagem e o link de avaliação já prontos para enviar em 1 clique.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 pt-4">
+                    {/* Campos de Contato */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Nome do Cliente
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Carlos Oliveira"
+                          value={dispatchName}
+                          onChange={(e) => setDispatchName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          WhatsApp do Cliente (com DDD)
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="(11) 98222-7526"
+                          value={dispatchPhone}
+                          onChange={handlePhoneChange}
+                          maxLength={15}
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Seletor de Tom de Voz da Mensagem */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Tom de Voz do Convite:
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setDispatchTone("standard")}
+                          className={`px-2.5 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                            dispatchTone === "standard"
+                              ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-xs"
+                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          🤝 Cordial
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDispatchTone("casual")}
+                          className={`px-2.5 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                            dispatchTone === "casual"
+                              ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-xs"
+                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          ✨ Amigável
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDispatchTone("post_sale")}
+                          className={`px-2.5 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                            dispatchTone === "post_sale"
+                              ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-xs"
+                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          📦 Pós-venda
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDispatchTone("custom");
+                            if (!customMessage) {
+                              setCustomMessage(
+                                `Olá ${dispatchName.trim() || "[Nome]"}! Aqui é da ${currentBusiness.name}. Adoramos ter você conosco! Poderia avaliar nossa loja? ${publicUrl}`
+                              );
+                            }
+                          }}
+                          className={`px-2.5 py-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
+                            dispatchTone === "custom"
+                              ? "bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-xs"
+                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          ✏️ Personalizar
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Caixa de Edição se "Personalizar" estiver ativo */}
+                    {dispatchTone === "custom" && (
+                      <div className="space-y-1 animate-in fade-in duration-150">
+                        <label className="block text-[11px] font-semibold text-slate-600">
+                          Edite o texto da mensagem:
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={customMessage}
+                          onChange={(e) => setCustomMessage(e.target.value)}
+                          className="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                        />
+                      </div>
+                    )}
+
+                    {/* Preview da Mensagem Estilo WhatsApp */}
+                    <div className="bg-[#e5ddd5]/30 p-3.5 rounded-2xl border border-slate-200/80">
+                      <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600 mb-2">
+                        <span>Como o cliente verá no WhatsApp:</span>
+                        <span className="text-emerald-700 font-mono text-[10px]">Prévia em tempo real</span>
+                      </div>
+                      <div className="bg-white p-3 rounded-2xl rounded-tl-sm shadow-xs border border-slate-100 text-xs text-slate-800 leading-relaxed whitespace-pre-wrap max-w-[95%]">
+                        {getDispatchMessage()}
+                        <div className="text-right text-[10px] text-slate-400 mt-1 font-mono">
+                          Agora ✓✓
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4">
+                {/* Botão de Disparo */}
+                <div className="pt-2">
                   <a
                     href={quickDispatchUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-semibold text-sm transition-all shadow-md ${
-                      dispatchPhone.length >= 8
+                    className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-white font-bold text-sm transition-all shadow-md cursor-pointer ${
+                      dispatchPhone.replace(/\D/g, "").length >= 10
                         ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25"
-                        : "bg-slate-300 pointer-events-none"
+                        : "bg-slate-300 pointer-events-none cursor-not-allowed opacity-60"
                     }`}
                   >
                     <Send className="w-4 h-4" />
-                    <span>Abrir WhatsApp com Mensagem Pronta</span>
+                    <span>
+                      {dispatchPhone.replace(/\D/g, "").length >= 10
+                        ? "Abrir WhatsApp com Convite Pronto"
+                        : "Digite o WhatsApp do cliente para enviar"}
+                    </span>
                   </a>
                 </div>
               </div>
