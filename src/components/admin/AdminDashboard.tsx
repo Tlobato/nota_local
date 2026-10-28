@@ -83,6 +83,7 @@ export default function AdminDashboard({
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
   // Estados de gestão de feedbacks e scripts
+  const [feedbackFilter, setFeedbackFilter] = useState<"all" | "pending" | "contacted" | "resolved">("all");
   const [selectedFeedbackForScripts, setSelectedFeedbackForScripts] = useState<Feedback | null>(null);
   const [editingResolutionId, setEditingResolutionId] = useState<string | null>(null);
   const [resolutionNotesInput, setResolutionNotesInput] = useState("");
@@ -161,6 +162,17 @@ export default function AdminDashboard({
   const totalReviews = feedbacks.length;
   const positiveReviews = feedbacks.filter((f) => f.rating >= 4 || f.redirectedToGoogle).length;
   const retainedCritiques = feedbacks.filter((f) => f.rating < 4 && !f.redirectedToGoogle).length;
+  const retainedList = feedbacks.filter((f) => !f.redirectedToGoogle);
+  const pendingCritiques = retainedList.filter((f) => f.status === "pending" || !f.status).length;
+  const contactedCritiques = retainedList.filter((f) => f.status === "contacted").length;
+  const resolvedCritiques = retainedList.filter((f) => f.status === "resolved").length;
+
+  const filteredRetainedFeedbacks = retainedList.filter((f) => {
+    if (feedbackFilter === "all") return true;
+    if (feedbackFilter === "pending") return f.status === "pending" || !f.status;
+    return f.status === feedbackFilter;
+  });
+
   const protectionRate = totalReviews > 0 ? Math.round((positiveReviews / totalReviews) * 100) : 100;
 
   const publicUrl = typeof window !== "undefined" ? `${window.location.origin}/${currentBusiness.slug}` : `/${currentBusiness.slug}`;
@@ -646,9 +658,9 @@ export default function AdminDashboard({
               <ShieldAlert className="w-4 h-4" />
               <span>Críticas Retidas</span>
             </div>
-            {retainedCritiques > 0 && (
+            {pendingCritiques > 0 && (
               <span className="bg-amber-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">
-                {retainedCritiques}
+                {pendingCritiques}
               </span>
             )}
           </button>
@@ -849,10 +861,61 @@ export default function AdminDashboard({
               </div>
             </div>
 
+            {/* Filtros de Status */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-b border-slate-200/70 pb-3">
+              <button
+                type="button"
+                onClick={() => setFeedbackFilter("all")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  feedbackFilter === "all"
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                Todas ({retainedList.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackFilter("pending")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  feedbackFilter === "pending"
+                    ? "bg-amber-500 text-slate-950 shadow-xs font-bold"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                <span>⏳ Pendentes</span>
+                {pendingCritiques > 0 && (
+                  <span className="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                    {pendingCritiques}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackFilter("contacted")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  feedbackFilter === "contacted"
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                📞 Em Contato ({contactedCritiques})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackFilter("resolved")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  feedbackFilter === "resolved"
+                    ? "bg-emerald-600 text-white shadow-xs"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                ✓ Resolvidas ({resolvedCritiques})
+              </button>
+            </div>
+
             <div className="space-y-4">
-              {feedbacks
-                .filter((f) => !f.redirectedToGoogle)
-                .map((f) => {
+              {filteredRetainedFeedbacks.map((f) => {
                   const hasName = Boolean(f.customerName && f.customerName.trim());
                   const hasPhone = Boolean(f.customerPhone && f.customerPhone.trim());
                   const cleanPhone = hasPhone ? f.customerPhone!.replace(/\D/g, "") : "";
@@ -1059,14 +1122,24 @@ export default function AdminDashboard({
                   );
                 })}
 
-              {feedbacks.filter((f) => !f.redirectedToGoogle).length === 0 && (
+              {filteredRetainedFeedbacks.length === 0 && (
                 <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 p-8">
                   <Check className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
                   <h3 className="text-base font-bold text-slate-800">
-                    Nenhuma crítica retida no momento!
+                    {feedbackFilter === "pending"
+                      ? "Nenhuma crítica pendente no momento!"
+                      : feedbackFilter === "contacted"
+                      ? "Nenhuma crítica marcada como 'Em Contato'."
+                      : feedbackFilter === "resolved"
+                      ? "Nenhuma crítica marcada como 'Resolvida' ainda."
+                      : "Nenhuma crítica retida no momento!"}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                    Todas as avaliações recentes foram positivas e direcionadas ao Google Maps.
+                    {feedbackFilter === "pending"
+                      ? "Excelente trabalho! Todas as queixas retidas foram solucionadas ou estão em atendimento."
+                      : feedbackFilter === "all"
+                      ? "Todas as avaliações recentes foram positivas e direcionadas diretamente ao Google Maps."
+                      : "Selecione outro filtro acima para visualizar o histórico de avaliações."}
                   </p>
                 </div>
               )}
