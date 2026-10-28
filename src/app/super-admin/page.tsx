@@ -1,6 +1,6 @@
 import React from "react";
 import { db } from "@/lib/db";
-import { businesses, feedbacks } from "@/lib/db/schema";
+import { businesses, feedbacks, prospects } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import SuperAdminDashboard from "@/components/admin/SuperAdminDashboard";
 import { auth, currentUser } from "@clerk/nextjs/server";
@@ -61,10 +61,15 @@ export default async function SuperAdminPage() {
     );
   }
 
-  // 4. Buscar todas as empresas cadastradas
-  const allBusinesses = await db.query.businesses.findMany({
-    orderBy: [desc(businesses.createdAt)],
-  });
+  // 4. Buscar todas as empresas cadastradas e todos os prospectos do CRM
+  const [allBusinesses, allProspects] = await Promise.all([
+    db.query.businesses.findMany({
+      orderBy: [desc(businesses.createdAt)],
+    }),
+    db.query.prospects.findMany({
+      orderBy: [desc(prospects.createdAt)],
+    }),
+  ]);
 
   // Enriquecer com contagem de feedbacks
   const enrichedBusinesses = await Promise.all(
@@ -94,6 +99,7 @@ export default async function SuperAdminPage() {
   return (
     <SuperAdminDashboard
       businesses={enrichedBusinesses}
+      initialProspects={allProspects}
       stats={{
         totalBusinesses,
         activeClients,

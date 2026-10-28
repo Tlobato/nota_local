@@ -36,7 +36,30 @@ export const feedbacks = pgTable("feedbacks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const prospects = pgTable("prospects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  businessName: text("business_name").notNull(),
+  category: text("category").default("Negócio Local"),
+  city: text("city"),
+  contactName: text("contact_name"),
+  phone: text("phone"),
+  email: text("email"),
+  instagramOrSite: text("instagram_or_site"),
+  googleUrl: text("google_url"),
+  googleRating: text("google_rating"),
+  googleReviewsCount: integer("google_reviews_count"),
+  status: text("status").default("mapped").notNull(),
+  channel: text("channel").default("whatsapp"),
+  notes: text("notes"),
+  lastContactAt: timestamp("last_contact_at"),
+  nextFollowUpDate: text("next_follow_up_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type Business = typeof businesses.$inferSelect;
 export type NewBusiness = typeof businesses.$inferInsert;
 export type Feedback = typeof feedbacks.$inferSelect;
 export type NewFeedback = typeof feedbacks.$inferInsert;
+export type Prospect = typeof prospects.$inferSelect;
+export type NewProspect = typeof prospects.$inferInsert;
