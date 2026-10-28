@@ -425,6 +425,119 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Vitrine da Placa de Balcão QR Code + Disparador de WhatsApp (Foco Conversão Google Ads) */}
+      <section className="py-20 px-4 sm:px-6 bg-slate-900 border-b border-slate-800/80">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            {/* Coluna Esquerda: Mockup Real da Plaquinha / Display de Balcão */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-[300px] bg-slate-100 p-3.5 rounded-[32px] shadow-2xl border border-slate-700/60 relative">
+                <div className="bg-white rounded-[24px] p-6 text-center shadow-sm border border-slate-200/80 flex flex-col items-center">
+                  {/* Barra de destaque superior */}
+                  <div className="w-14 h-1.5 rounded-full bg-blue-600 mb-3.5" />
+
+                  {/* 5 Estrelas Douradas */}
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+
+                  <span className="text-sm font-extrabold text-slate-900 tracking-tight mb-2">
+                    Sua Empresa / Clínica
+                  </span>
+
+                  <h4 className="text-base font-extrabold text-slate-900 leading-snug mb-1.5">
+                    Sua opinião vale muito para nós!
+                  </h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-4">
+                    Aponte a câmera do seu celular para o QR Code abaixo e nos avalie em 30 segundos:
+                  </p>
+
+                  {/* QR Code Visual Nítido */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border-2 border-slate-200 mb-4 flex flex-col items-center justify-center">
+                    <QrCode className="w-32 h-32 text-slate-900 stroke-[1.5]" />
+                  </div>
+
+                  <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-bold">
+                    <Zap className="w-3 h-3 fill-blue-600 text-blue-600" />
+                    <span>Leva menos de 30 segundos</span>
+                  </div>
+                </div>
+                {/* Base do Display */}
+                <div className="w-28 h-2 bg-slate-300 rounded-b-xl mx-auto mt-1.5 opacity-75" />
+              </div>
+            </div>
+
+            {/* Coluna Direita: Explicação + Benefícios da Placa Inteligente vs Placa Comum */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-bold uppercase tracking-wider">
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Placa QR Code de Balcão + Link para WhatsApp</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
+                Por que uma placa de QR Code comum pode ser um{" "}
+                <span className="text-amber-400">tiro no pé</span>?
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                Quando você compra uma placa comum ou manda o link direto do Google, você entrega uma arma na mão do cliente que teve qualquer pequeno imprevisto. Com o <strong>NotaLocal</strong>, você gera sua <strong>Arte de Balcão com QR Code Inteligente</strong> pronta para imprimir em 2 minutos:
+              </p>
+
+              <div className="space-y-3.5">
+                <div className="flex items-start gap-3 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/70">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      Arte Digital da Placa Pronta em Alta Definição (300 DPI)
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                      Personalize com o nome e a cor da sua empresa, baixe em PNG ou imprima em 1 clique para colocar em displays de acrílico na recepção, mesas ou caixa.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/70">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      Filtro Automático Embutido no QR Code e no Link
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                      Quem marca <strong>4 ou 5 estrelas</strong> é levado direto para avaliar você no Google. Quem marca de <strong>1 a 3 estrelas</strong> cai no seu canal interno privado sem prejudicar sua nota pública.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/70">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      Disparador de Convites pelo WhatsApp Incluso
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                      O paciente ou cliente já saiu da loja? Envie o convite de avaliação pelo WhatsApp com textos prontos em 1 clique direto pelo nosso painel.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
+                <Link
+                  href="/onboarding"
+                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 transition-all"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Gerar Meu QR Code e Placa Grátis (7 Dias)</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Por que isso é vital para o comércio? */}
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
