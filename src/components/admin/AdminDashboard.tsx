@@ -43,6 +43,17 @@ const COLOR_PRESETS = [
   { name: "Índigo Profundo (Corporativo e Tech)", hex: "#4f46e5" },
 ];
 
+const formatPhoneMask = (val: string) => {
+  const digits = val.replace(/\D/g, "");
+  const localDigits = digits.startsWith("55") && digits.length >= 12 ? digits.slice(2) : digits;
+  const raw = localDigits.slice(0, 11);
+  if (!raw) return "";
+  if (raw.length <= 2) return `(${raw}`;
+  if (raw.length <= 6) return `(${raw.slice(0, 2)}) ${raw.slice(2)}`;
+  if (raw.length <= 10) return `(${raw.slice(0, 2)}) ${raw.slice(2, 6)}-${raw.slice(6)}`;
+  return `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7, 11)}`;
+};
+
 interface AdminDashboardProps {
   initialBusiness: Business;
   initialFeedbacks: Feedback[];
@@ -86,12 +97,23 @@ export default function AdminDashboard({
     name: currentBusiness.name,
     category: currentBusiness.category || "",
     googleReviewUrl: currentBusiness.googleReviewUrl,
-    notificationPhone: currentBusiness.notificationPhone || "",
+    notificationPhone: formatPhoneMask(currentBusiness.notificationPhone || ""),
     welcomeMessage: currentBusiness.welcomeMessage || "",
     coverColor: currentBusiness.coverColor || "#2563eb",
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
+
+  useEffect(() => {
+    setSettingsForm({
+      name: currentBusiness.name,
+      category: currentBusiness.category || "",
+      googleReviewUrl: currentBusiness.googleReviewUrl,
+      notificationPhone: formatPhoneMask(currentBusiness.notificationPhone || ""),
+      welcomeMessage: currentBusiness.welcomeMessage || "",
+      coverColor: currentBusiness.coverColor || "#2563eb",
+    });
+  }, [currentBusiness]);
 
   // Estados de gestão de feedbacks e scripts
   const [feedbackFilter, setFeedbackFilter] = useState<"all" | "pending" | "contacted" | "resolved">("all");
@@ -263,10 +285,15 @@ export default function AdminDashboard({
     setSettingsSuccess(false);
 
     try {
+      const payload = {
+        ...settingsForm,
+        notificationPhone: settingsForm.notificationPhone ? settingsForm.notificationPhone.replace(/\D/g, "") : null,
+      };
+
       const res = await fetch(`/api/business/${currentBusiness.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settingsForm),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -310,7 +337,7 @@ export default function AdminDashboard({
     if (dispatchTone === "standard") {
       return `Olá ${nome}! Aqui é da equipe da ${empresa}.\n\nFoi um prazer atender você! Poderia nos avaliar rapidamente no link abaixo? Leva apenas 30 segundos e nos ajuda muito:\n${link}`;
     } else if (dispatchTone === "casual") {
-      return `Oi ${nome}, tudo bem?\n\nPassando para agradecer pela sua preferência hoje! Se puder contar como foi sua experiência, vai fazer nosso dia:\n${link}`;
+      return `Oi ${nome}, tudo bem?\n\nPassando para agradecer pela sua preferência hoje! Se puder contar como foi sua experiência, vai fazer nosso dia feliz:\n${link}`;
     } else if (dispatchTone === "post_sale") {
       return `Olá ${nome}! Esperamos que tenha gostado do seu pedido/atendimento na ${empresa}!\n\nConte pra gente como foi sua experiência no link:\n${link}`;
     } else {
@@ -1601,16 +1628,24 @@ export default function AdminDashboard({
                 </label>
                 <input
                   type="tel"
-                  placeholder="Ex: 5515998383997"
+                  placeholder="(11) 98888-8888"
                   value={settingsForm.notificationPhone}
-                  onChange={(e) => setSettingsForm({ ...settingsForm, notificationPhone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  onChange={(e) =>
+                    setSettingsForm({
+                      ...settingsForm,
+                      notificationPhone: formatPhoneMask(e.target.value),
+                    })
+                  }
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                 />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Número que receberá a notificação caso algum cliente deixe uma avaliação de 1 a 3 estrelas.
+                </p>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Mensagem de Boas-Vindas
+                  Mensagem de Boas-Vindas (Pergunta Principal)
                 </label>
                 <input
                   type="text"
@@ -1618,6 +1653,9 @@ export default function AdminDashboard({
                   onChange={(e) => setSettingsForm({ ...settingsForm, welcomeMessage: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Esta é a pergunta que o cliente vê em destaque na sua página de avaliação logo acima das 5 estrelas.
+                </p>
               </div>
 
               <div>
