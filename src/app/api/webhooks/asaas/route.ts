@@ -5,6 +5,15 @@ import { eq, or } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
+    // Se houver token de segurança de webhook configurado, valida o cabeçalho oficial do Asaas
+    const expectedToken = process.env.ASAAS_WEBHOOK_TOKEN;
+    if (expectedToken) {
+      const receivedToken = req.headers.get("asaas-access-token");
+      if (receivedToken !== expectedToken) {
+        return NextResponse.json({ error: "Webhook token inválido" }, { status: 401 });
+      }
+    }
+
     const event = await req.json();
 
     // Eventos de sucesso do Asaas: PAYMENT_RECEIVED ou PAYMENT_CONFIRMED

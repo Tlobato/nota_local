@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { businesses, feedbacks } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const allBusinesses = await db.query.businesses.findMany({
       orderBy: [desc(businesses.createdAt)],
     });
@@ -35,6 +41,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = await req.json();
     const { name, slug, category, ownerEmail, googleReviewUrl, notificationPhone, paymentStatus } = body;
 
@@ -87,6 +98,11 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = await req.json();
     const { id, paymentStatus } = body;
 

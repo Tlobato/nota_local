@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { prospects } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const allProspects = await db.query.prospects.findMany({
       orderBy: [desc(prospects.createdAt)],
     });
@@ -17,6 +23,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = await req.json();
     const {
       businessName,
@@ -77,6 +88,11 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const body = await req.json();
     const { id, ...updates } = body;
 
@@ -133,6 +149,11 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const { isSuperAdmin } = await getAuthenticatedUser();
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
