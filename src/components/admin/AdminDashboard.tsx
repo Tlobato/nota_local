@@ -27,6 +27,9 @@ import {
   RefreshCw,
   Printer,
   SlidersHorizontal,
+  Eye,
+  EyeOff,
+  Trash2,
 } from "lucide-react";
 import type { Business, Feedback } from "@/lib/db/schema";
 import QRCodeLib from "qrcode";
@@ -125,6 +128,40 @@ export default function AdminDashboard({
   const [savingResolution, setSavingResolution] = useState(false);
   const [copiedScriptIndex, setCopiedScriptIndex] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hiddenComments, setHiddenComments] = useState<Record<string, boolean>>({});
+  const [deletingFeedbackId, setDeletingFeedbackId] = useState<string | null>(null);
+
+  const toggleHideComment = (id: string) => {
+    setHiddenComments((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    if (!window.confirm("Deseja realmente excluir este feedback? Esta ação removerá o registro do seu painel e atualizará as métricas.")) {
+      return;
+    }
+
+    setDeletingFeedbackId(id);
+    const previous = feedbacks;
+    setFeedbacks((prev) => prev.filter((f) => f.id !== id));
+
+    try {
+      const res = await fetch(`/api/feedback/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error("Erro ao excluir");
+      }
+    } catch (err) {
+      console.error("Erro ao excluir feedback:", err);
+      alert("Não foi possível excluir o feedback. Tente novamente.");
+      setFeedbacks(previous);
+    } finally {
+      setDeletingFeedbackId(null);
+    }
+  };
 
   // Auto-refresh inteligente com tripla proteção de custos e recursos
   const lastActivityRef = useRef<number>(Date.now());
@@ -1064,16 +1101,20 @@ export default function AdminDashboard({
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 break-words sm:truncate sm:max-w-md mt-0.5">
-                          {f.comment ||
+                          {hiddenComments[f.id] ? (
+                            <span className="italic text-slate-400 select-none">•••••••••• (comentário ocultado)</span>
+                          ) : (
+                            f.comment ||
                             (f.redirectedToGoogle
                               ? "Avaliação 5 estrelas enviada ao Google"
-                              : "Sem comentário escrito")}
+                              : "Sem comentário escrito")
+                          )}
                         </p>
                       </div>
                     </div>
-                    <div className="hidden sm:block text-right shrink-0">
+                    <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
                       <span
-                        className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
+                        className={`hidden sm:inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
                           f.redirectedToGoogle
                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -1081,6 +1122,31 @@ export default function AdminDashboard({
                       >
                         {f.redirectedToGoogle ? "Enviado ao Google" : "Retido no Painel"}
                       </span>
+
+                      {f.comment && (
+                        <button
+                          type="button"
+                          onClick={() => toggleHideComment(f.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                          title={hiddenComments[f.id] ? "Exibir comentário" : "Ocultar comentário"}
+                        >
+                          {hiddenComments[f.id] ? (
+                            <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+                          ) : (
+                            <Eye className="w-3.5 h-3.5 text-slate-400" />
+                          )}
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFeedback(f.id)}
+                        disabled={deletingFeedbackId === f.id}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                        title="Excluir este feedback (limpar teste/trote)"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1207,7 +1273,7 @@ export default function AdminDashboard({
                           </span>
                         </div>
 
-                        {/* Status Select */}
+                        {/* Status Select e Ações de Privacidade/Exclusão */}
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-slate-400 font-medium hidden sm:inline">Status do Caso:</span>
                           <select
@@ -1232,6 +1298,33 @@ export default function AdminDashboard({
                             <option value="contacted">📞 Em Contato</option>
                             <option value="resolved">✓ Resolvido</option>
                           </select>
+
+                          <div className="flex items-center gap-1 border-l border-slate-200 pl-1.5 ml-1">
+                            {f.comment && (
+                              <button
+                                type="button"
+                                onClick={() => toggleHideComment(f.id)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                title={hiddenComments[f.id] ? "Exibir texto do relato" : "Ocultar texto do relato"}
+                              >
+                                {hiddenComments[f.id] ? (
+                                  <EyeOff className="w-4 h-4 text-slate-500" />
+                                ) : (
+                                  <Eye className="w-4 h-4 text-slate-400" />
+                                )}
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteFeedback(f.id)}
+                              disabled={deletingFeedbackId === f.id}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                              title="Excluir este feedback (limpar teste/trote)"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -1258,7 +1351,14 @@ export default function AdminDashboard({
 
                       {/* Relato do Cliente */}
                       <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/70 text-slate-700 text-sm leading-relaxed">
-                        &quot;{f.comment || "Nenhum comentário por escrito deixado pelo cliente."}&quot;
+                        {hiddenComments[f.id] ? (
+                          <span className="text-slate-400 select-none italic text-xs flex items-center gap-1.5">
+                            <EyeOff className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>Comentário ocultado pelo gestor (toque no ícone de olho para exibir)</span>
+                          </span>
+                        ) : (
+                          <span>&quot;{f.comment || "Nenhum comentário por escrito deixado pelo cliente."}&quot;</span>
+                        )}
                       </div>
 
                       {/* Ações Inteligentes: Apoio Contextual ao Dono */}
