@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { businesses } from "@/lib/db/schema";
@@ -11,11 +12,16 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const business = await db.query.businesses.findFirst({
+// Deduplica a consulta no banco entre generateMetadata e a renderização da página (reduz o tempo de resposta pela metade)
+const getBusinessBySlug = cache(async (slug: string) => {
+  return db.query.businesses.findFirst({
     where: eq(businesses.slug, slug),
   });
+});
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const business = await getBusinessBySlug(slug);
 
   if (!business) {
     return {
@@ -32,9 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BusinessReviewPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const business = await db.query.businesses.findFirst({
-    where: eq(businesses.slug, slug),
-  });
+  const business = await getBusinessBySlug(slug);
 
   if (!business) {
     notFound();

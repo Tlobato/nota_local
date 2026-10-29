@@ -61,32 +61,32 @@ export default async function SuperAdminPage() {
     );
   }
 
-  // 4. Buscar todas as empresas cadastradas e todos os prospectos do CRM
-  const [allBusinesses, allProspects] = await Promise.all([
+  // 4. Buscar empresas, prospectos e contagem de avaliações em 1 única rodada paralela (elimina N+1 queries)
+  const [allBusinesses, allProspects, feedbackCounts] = await Promise.all([
     db.query.businesses.findMany({
       orderBy: [desc(businesses.createdAt)],
     }),
     db.query.prospects.findMany({
       orderBy: [desc(prospects.createdAt)],
     }),
+    db
+      .select({
+        businessId: feedbacks.businessId,
+        count: sql<number>`count(*)`,
+      })
+      .from(feedbacks)
+      .groupBy(feedbacks.businessId),
   ]);
 
-  // Enriquecer com contagem de feedbacks
-  const enrichedBusinesses = await Promise.all(
-    allBusinesses.map(async (b) => {
-      const counts = await db
-        .select({
-          count: sql<number>`count(*)`,
-        })
-        .from(feedbacks)
-        .where(eq(feedbacks.businessId, b.id));
+  const countMap = new Map<string, number>();
+  for (const row of feedbackCounts) {
+    countMap.set(row.businessId, Number(row.count || 0));
+  }
 
-      return {
-        ...b,
-        feedbackCount: Number(counts[0]?.count || 0),
-      };
-    })
-  );
+  const enrichedBusinesses = allBusinesses.map((b) => ({
+    ...b,
+    feedbackCount: countMap.get(b.id) || 0,
+  }));
 
   // Calcular métricas globais
   const totalBusinesses = enrichedBusinesses.length;

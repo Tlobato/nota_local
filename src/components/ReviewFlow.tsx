@@ -80,14 +80,14 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
     }
   }, [step, business.googleReviewUrl]);
 
-  // Envio do formulário de crítica privada
+  // Envio do formulário de crítica privada (UI Otimista instantânea no celular)
   const handleSubmitNegative = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRating) return;
 
-    setLoading(true);
+    setStep("negative_done");
     try {
-      const res = await fetch("/api/feedback", {
+      await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -98,19 +98,8 @@ export default function ReviewFlow({ business }: ReviewFlowProps) {
           comment,
         }),
       });
-
-      const data = await res.json();
-      setStep("negative_done");
-
-      // Se houver alerta de WhatsApp configurado, notifica
-      if (data.whatsappAlertUrl) {
-        // Alerta gerado com sucesso
-      }
     } catch (err) {
       console.error(err);
-      alert("Houve um erro ao enviar seu recado. Por favor, tente novamente.");
-    } finally {
-      setLoading(false);
     }
   };
 

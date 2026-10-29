@@ -11,26 +11,28 @@ export async function GET() {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
 
-    const allBusinesses = await db.query.businesses.findMany({
-      orderBy: [desc(businesses.createdAt)],
-    });
+    const [allBusinesses, feedbackCounts] = await Promise.all([
+      db.query.businesses.findMany({
+        orderBy: [desc(businesses.createdAt)],
+      }),
+      db
+        .select({
+          businessId: feedbacks.businessId,
+          count: sql<number>`count(*)`,
+        })
+        .from(feedbacks)
+        .groupBy(feedbacks.businessId),
+    ]);
 
-    // Pega a contagem de feedbacks de cada empresa
-    const enriched = await Promise.all(
-      allBusinesses.map(async (b) => {
-        const counts = await db
-          .select({
-            count: sql<number>`count(*)`,
-          })
-          .from(feedbacks)
-          .where(eq(feedbacks.businessId, b.id));
+    const countMap = new Map<string, number>();
+    for (const row of feedbackCounts) {
+      countMap.set(row.businessId, Number(row.count || 0));
+    }
 
-        return {
-          ...b,
-          feedbackCount: Number(counts[0]?.count || 0),
-        };
-      })
-    );
+    const enriched = allBusinesses.map((b) => ({
+      ...b,
+      feedbackCount: countMap.get(b.id) || 0,
+    }));
 
     return NextResponse.json({ success: true, businesses: enriched });
   } catch (error) {
