@@ -39,6 +39,7 @@ export async function DELETE(
     return NextResponse.json({ success: true, message: "Feedback excluído com sucesso." });
   } catch (error) {
     console.error("Erro ao excluir feedback:", error);
-    return NextResponse.json({ error: "Erro interno ao excluir feedback" }, { status: 500 });
+    return NextResponse.json({ error: "Internal error deleting feedback" }, { status: 500 });
   }
 }
+

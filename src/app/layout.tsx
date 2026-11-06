@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NotaLocal | Blindagem e Reputação no Google",
-  description: "Multiplique avaliações 5 estrelas no Google e retenha críticas internamente com inteligência.",
+  title: "NotaLocal | Local Reputation & Google Review Management",
+  description: "Boost 5-star Google reviews and resolve negative customer feedback privately before it hurts your local business reputation.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const content = (
-    <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white flex flex-col">
         {children}
       </body>

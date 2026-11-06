@@ -22,7 +22,7 @@ export default function OnboardingPage() {
   const [form, setForm] = useState({
     name: "",
     slug: "",
-    category: "Clínica Odontológica",
+    category: "Dental Care & Aesthetics",
     googleReviewUrl: "",
     notificationPhone: "",
     coverColor: "#2563eb",
@@ -39,17 +39,7 @@ export default function OnboardingPage() {
     "#4f46e5",
   ];
 
-  const formatPhoneMask = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    if (digits.length === 0) return "";
-    if (digits.length <= 2) return `(${digits}`;
-    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    if (digits.length <= 10)
-      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  };
-
-  // Gerar slug automaticamente ao digitar o nome
+  // Auto-generate slug when typing business name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     const autoSlug = name
@@ -81,14 +71,14 @@ export default function OnboardingPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao configurar empresa.");
+        throw new Error(data.error || "Failed to configure business profile.");
       }
 
-      // Redireciona para o painel de gestão da nova empresa
+      // Redirect to admin management dashboard
       router.push(`/admin`);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Ocorreu um erro ao cadastrar.");
+      setError(err.message || "An error occurred while saving profile.");
     } finally {
       setLoading(false);
     }
@@ -102,25 +92,25 @@ export default function OnboardingPage() {
         </div>
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-3">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>7 Dias de Teste Grátis • Sem precisar de cartão</span>
+          <span>7-Day Free Trial • No Credit Card Required</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Configuração do seu Estabelecimento
+          Configure Your Business Profile
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-400">
-          Leva menos de 2 minutos para colocar sua blindagem e QR Code no ar gratuitamente por 7 dias.
+          Takes under 2 minutes to generate your customized review funnel and QR placards.
         </p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-xl">
         <div className="bg-white text-slate-900 py-8 px-6 sm:px-10 rounded-3xl shadow-2xl border border-slate-100">
-          {/* Aviso de Confiança Sem Cartão */}
+          {/* Card-Free Guarantee Badge */}
           <div className="mb-6 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-start gap-3">
             <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
               ✓
             </div>
             <div className="text-xs text-emerald-950 leading-relaxed">
-              <strong className="font-extrabold">Zero dados financeiros:</strong> Não pedimos cartão de crédito, CPF nem dados bancários para liberar seus 7 dias grátis. Não há cobrança automática no final do teste.
+              <strong className="font-extrabold">Zero financial commitment:</strong> We do not ask for credit card or banking details to start your free 7-day trial. No automatic billing.
             </div>
           </div>
 
@@ -131,16 +121,16 @@ export default function OnboardingPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nome da Empresa */}
+            {/* Business Name */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Nome da sua Empresa ou Clínica
+                Business / Clinic Name
               </label>
               <div className="relative">
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Clínica Sorriso Perfeito"
+                  placeholder="e.g., Smile Dental Care Clinic"
                   value={form.name}
                   onChange={handleNameChange}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-900"
@@ -148,97 +138,97 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            {/* Link Personalizado (Slug) */}
+            {/* Custom URL Slug */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Endereço Exclusivo da sua Página (Slug)
+                Custom Page Slug
               </label>
               <div className="flex items-center rounded-xl border border-slate-200 overflow-hidden bg-slate-50 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500">
                 <span className="px-3.5 text-xs text-slate-400 font-mono font-medium select-none">
-                  notalocal.com.br/
+                  notalocal.com/
                 </span>
                 <input
                   type="text"
                   required
-                  placeholder="sua-empresa"
+                  placeholder="your-business"
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })}
                   className="w-full py-3 pr-4 bg-transparent text-sm font-semibold text-slate-900 focus:outline-none"
                 />
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
-                Este é o link que vai no QR Code do seu balcão e no WhatsApp dos clientes.
+                This URL is embedded in your counter QR code and mobile review invites.
               </p>
             </div>
 
-            {/* Categoria */}
+            {/* Category */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Ramo de Atuação
+                Business Category
               </label>
               <input
                 type="text"
                 required
-                placeholder="Ex: Odontologia Especializada, Oficina Mecânica, Barbearia"
+                placeholder="e.g., Dentistry & Oral Surgery, Auto Repair, Barber Shop"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
             </div>
 
-            {/* Link Oficial de Review do Google */}
+            {/* Official Google Review Link */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Link de Avaliação do Google
+                  Official Google Review URL
                 </label>
                 <a
-                  href="https://support.google.com/business/answer/3474122?hl=pt-BR"
+                  href="https://support.google.com/business/answer/3474122"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[11px] text-blue-600 hover:underline flex items-center gap-1 font-medium"
                 >
                   <HelpCircle className="w-3 h-3" />
-                  <span>Como pegar meu link?</span>
+                  <span>How to find my link?</span>
                 </a>
               </div>
               <input
                 type="url"
                 required
-                placeholder="https://search.google.com/local/writereview?placeid=... ou g.page/r/..."
+                placeholder="https://search.google.com/local/writereview?placeid=... or g.page/r/..."
                 value={form.googleReviewUrl}
                 onChange={(e) => setForm({ ...form, googleReviewUrl: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                Para cá serão direcionados todos os clientes que derem 4 ou 5 estrelas.
+                Satisfied customers (4 or 5 stars) will be routed directly to this link.
               </p>
             </div>
 
-            {/* WhatsApp para Alerta de Crise */}
+            {/* Notification Contact */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                WhatsApp do Responsável (com DDD)
+                Manager Notification Phone / WhatsApp
               </label>
               <input
                 type="tel"
                 required
-                placeholder="(11) 99999-9999"
+                placeholder="+1 (555) 123-4567"
                 value={form.notificationPhone}
                 onChange={(e) =>
-                  setForm({ ...form, notificationPhone: formatPhoneMask(e.target.value) })
+                  setForm({ ...form, notificationPhone: e.target.value })
                 }
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                Usado para suporte na ativação da sua placa e avisos do seu painel.
+                Used to alert your team immediately when constructive feedback requires attention.
               </p>
             </div>
 
-            {/* Cor da Marca */}
+            {/* Brand Color */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Cor de Destaque da sua Marca
+                Brand Accent Color
               </label>
               <div className="flex flex-wrap items-center gap-2.5">
                 {COLOR_PRESETS.map((hex) => (
@@ -259,13 +249,13 @@ export default function OnboardingPage() {
                   value={form.coverColor}
                   onChange={(e) => setForm({ ...form, coverColor: e.target.value })}
                   className="w-9 h-9 p-0.5 rounded-xl border border-slate-200 cursor-pointer bg-white"
-                  title="Escolher outra cor"
+                  title="Choose custom color"
                 />
                 <span className="text-xs text-slate-500 font-mono">{form.coverColor}</span>
               </div>
             </div>
 
-            {/* Botão de Finalização */}
+            {/* Submit Button */}
             <div className="pt-4 space-y-2.5">
               <button
                 type="submit"
@@ -273,16 +263,16 @@ export default function OnboardingPage() {
                 className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
-                  <span>Liberando seus 7 dias grátis...</span>
+                  <span>Activating 7-day trial...</span>
                 ) : (
                   <>
-                    <span>Iniciar Meus 7 Dias Grátis</span>
+                    <span>Start Free 7-Day Trial</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
               <p className="text-[11px] text-center text-slate-400">
-                Acesso 100% liberado por 7 dias sem cobrança automática. Você só assina se gostar do resultado!
+                Full access for 7 days with no automatic renewal. Only subscribe if you love the results.
               </p>
             </div>
           </form>

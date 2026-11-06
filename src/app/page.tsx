@@ -25,11 +25,11 @@ import confetti from "canvas-confetti";
 import Logo from "@/components/Logo";
 
 const SIMULATOR_RATINGS: Record<number, { label: string; emoji: string }> = {
-  1: { label: "Muito insatisfeito", emoji: "😞" },
-  2: { label: "Poderia ser melhor", emoji: "🙁" },
-  3: { label: "Razoável / Regular", emoji: "😐" },
-  4: { label: "Muito bom!", emoji: "😊" },
-  5: { label: "Excelente! Perfeito!", emoji: "🤩" },
+  1: { label: "Very unsatisfied", emoji: "😞" },
+  2: { label: "Could be better", emoji: "🙁" },
+  3: { label: "Average / Fair", emoji: "😐" },
+  4: { label: "Very good!", emoji: "😊" },
+  5: { label: "Outstanding! Perfect!", emoji: "🤩" },
 };
 
 export default function LandingPage() {
@@ -73,10 +73,10 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/clinica-sorriso"
+              href="/smile-dental-care"
               className="hidden sm:inline-block text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
             >
-              Ver Demo
+              Live Demo
             </Link>
 
             {isLoaded && isSignedIn ? (
@@ -85,7 +85,7 @@ export default function LandingPage() {
                   href="/admin"
                   className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all flex items-center gap-1.5"
                 >
-                  <span>Acessar Meu Painel</span>
+                  <span>Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <div className="ml-1 flex items-center">
@@ -98,13 +98,13 @@ export default function LandingPage() {
                   href="/admin"
                   className="text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-colors"
                 >
-                  Entrar
+                  Sign In
                 </Link>
                 <Link
                   href="/onboarding"
                   className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/30 transition-all"
                 >
-                  Testar 7 Dias Grátis
+                  Start Free Trial
                 </Link>
               </>
             )}
@@ -119,18 +119,18 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-semibold shadow-sm">
             <span className="text-amber-400 text-sm">⭐</span>
-            <span>A plataforma de reputação definitiva para o seu negócio local</span>
+            <span>The definitive reputation platform for local businesses</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
-            Proteja sua nota no Google e{" "}
+            Protect your Google score and{" "}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">
-              multiplique avaliações 5 estrelas.
+              multiply 5-star reviews.
             </span>
           </h1>
 
           <p className="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
-            O filtro inteligente que direciona clientes satisfeitos direto para o seu perfil no Google e retém críticas internamente antes que virem queixas públicas.
+            The intelligent review funnel that routes delighted customers straight to your Google profile while retaining constructive feedback internally before it becomes public.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -140,15 +140,15 @@ export default function LandingPage() {
                   href="/admin"
                   className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Ir para o Meu Painel do Gestor</span>
+                  <span>Go to Management Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <a
-                  href="#simulador"
+                  href="#simulator"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-base border border-slate-700 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Testar Simulador</span>
+                  <span>Try Simulator</span>
                 </a>
               </>
             ) : (
@@ -158,15 +158,15 @@ export default function LandingPage() {
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-base shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Testar 7 Dias Grátis</span>
+                  <span>Start 7-Day Free Trial</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <a
-                  href="#simulador"
+                  href="#simulator"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-base border border-slate-700 transition-all flex items-center justify-center gap-2"
                 >
-                  <span>Testar Simulador na Prática</span>
+                  <span>Interactive Simulator</span>
                 </a>
               </>
             )}
@@ -176,39 +176,38 @@ export default function LandingPage() {
             <div className="pt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-medium text-slate-300">
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Não pedimos cartão nem dados bancários</span>
+                <span>No credit card or banking details required</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Zero cobrança automática após os 7 dias</span>
+                <span>Zero automatic billing after trial period</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Placa e QR Code prontos em 2 minutos</span>
+                <span>Printable QR placard ready in 2 minutes</span>
               </span>
             </div>
           )}
         </div>
       </section>
 
-      {/* Simulador Interativo */}
-      <section id="simulador" className="py-16 px-4 sm:px-6 bg-slate-950/60 border-y border-slate-800">
+      {/* Interactive Simulator */}
+      <section id="simulator" className="py-16 px-4 sm:px-6 bg-slate-950/60 border-y border-slate-800">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">
-              Experiência Real
+              Live Interactive Test
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
-              Faça o teste agora mesmo
+              Test both customer paths right now
             </h2>
             <p className="text-sm text-slate-400 mt-2">
-              Clique em uma nota abaixo e veja como o NotaLocal se comporta com clientes satisfeitos vs insatisfeitos:
+              Select a star rating below to experience how NotaLocal handles happy vs unhappy customers:
             </p>
           </div>
 
-          {/* Container do Simulador (Idêntico à experiência real do cliente) */}
+          {/* Simulator Container */}
           <div className="w-full max-w-md mx-auto bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-            {/* Banner Superior da Empresa Simulada */}
             <div
               className="h-24 flex flex-col justify-end p-5 text-white relative overflow-hidden"
               style={{
@@ -217,13 +216,13 @@ export default function LandingPage() {
             >
               <div className="absolute top-3 right-4 flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/20">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Canal Oficial de Atendimento</span>
+                <span>Official Feedback Channel</span>
               </div>
               <p className="text-[11px] uppercase tracking-wider text-white/75 font-semibold">
-                Simulação Interativa
+                Interactive Preview
               </p>
               <h3 className="text-lg font-bold truncate leading-tight">
-                Sua Empresa / Clínica Aqui
+                Your Local Business / Clinic
               </h3>
             </div>
 
@@ -231,10 +230,10 @@ export default function LandingPage() {
               {demoStep === "choose" && (
                 <div className="py-2 text-center">
                   <h4 className="text-base sm:text-lg font-bold text-slate-800 mb-1.5">
-                    Como foi sua experiência conosco hoje?
+                    How was your experience with us today?
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-500 mb-5">
-                    Toque nas estrelas abaixo para testar os dois caminhos:
+                    Tap a star below to trigger the simulation:
                   </p>
 
                   <div className="flex justify-center items-center gap-2 mb-4">
@@ -250,10 +249,10 @@ export default function LandingPage() {
                           className="p-1.5 hover:scale-125 active:scale-95 transition-transform cursor-pointer"
                         >
                           <Star
-                            className={`w-10 h-10 transition-colors ${
+                            className={`w-9 h-9 transition-colors ${
                               isFilled
-                                ? "fill-amber-400 text-amber-400 filter drop-shadow-sm"
-                                : "fill-amber-400/20 text-amber-400/60"
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-slate-200 fill-slate-50"
                             }`}
                           />
                         </button>
@@ -263,83 +262,62 @@ export default function LandingPage() {
 
                   <div className="h-8 flex items-center justify-center">
                     {activeStar > 0 ? (
-                      <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-50 px-3.5 py-1 rounded-full border border-slate-200/80">
-                        <span>{SIMULATOR_RATINGS[activeStar].emoji}</span>
-                        <span>{SIMULATOR_RATINGS[activeStar].label}</span>
-                      </div>
+                      <span className="text-xs font-semibold px-3 py-1 bg-amber-50 text-amber-800 rounded-full border border-amber-200">
+                        {SIMULATOR_RATINGS[activeStar].emoji}{" "}
+                        {SIMULATOR_RATINGS[activeStar].label}
+                      </span>
                     ) : (
-                      <p className="text-xs text-slate-500">
-                        Experimente clicar em <strong>5 estrelas</strong> ou em{" "}
-                        <strong>2 estrelas</strong>.
-                      </p>
+                      <span className="text-xs text-slate-400">
+                        Select 1 to 5 stars
+                      </span>
                     )}
                   </div>
                 </div>
               )}
 
               {demoStep === "positive" && (
-                <div className="py-2 text-center space-y-3 animate-in fade-in">
-                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Cenário {demoRating} Estrelas: Cliente direcionado ao Google!</span>
+                <div className="py-4 text-center space-y-4 animate-in fade-in">
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-7 h-7" />
                   </div>
-
-                  <div className="pt-2">
-                    <span className="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
-                      {"⭐".repeat(demoRating || 5)} Experiência Incrível!
-                    </span>
-                    <h4 className="text-lg font-bold text-slate-900">
-                      Muito obrigado pelo carinho!
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900">
+                      High Rating Detected! 🎉
                     </h4>
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Como o cliente deu nota alta, o sistema agradece e já abre automaticamente a caixa de avaliação oficial da sua empresa no Google!
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                      Happy customers (4 or 5 stars) are guided with 1 click directly to post their praise on Google Reviews!
                     </p>
                   </div>
 
-                  <div className="pt-2">
-                    <div className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-md">
-                      <span>Abrindo Avaliação no Google...</span>
-                      <ExternalLink className="w-4 h-4" />
-                    </div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-left text-xs text-blue-900">
+                    <p className="font-semibold mb-1">⚡ Automatic Redirection:</p>
+                    <p className="text-blue-700">
+                      The customer is instantly forwarded to your official Google Maps listing to amplify your ranking and public score.
+                    </p>
                   </div>
 
                   <button
                     type="button"
                     onClick={resetDemo}
-                    className="pt-2 text-xs text-blue-600 font-bold hover:underline cursor-pointer block mx-auto"
+                    className="text-xs text-blue-600 font-bold hover:underline cursor-pointer"
                   >
-                    ← Voltar e testar nota baixa (1 a 3 estrelas)
+                    ← Test a low rating (1 to 3 stars)
                   </button>
                 </div>
               )}
 
               {demoStep === "negative_form" && (
-                <div className="py-1 animate-in fade-in space-y-3">
-                  {/* Explicação do que está acontecendo para o dono do negócio */}
-                  <div className="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-xl text-[11px] leading-snug flex items-start gap-2">
-                    <ShieldAlert className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Veja o filtro em ação ({demoRating}⭐):</strong> Em vez de mandar o cliente irritado para o Google, abrimos na hora esta Ouvidoria Privada para ele desabafar direto com você:
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200/80 p-3 rounded-2xl text-amber-900">
-                    <MessageSquareWarning className="w-5 h-5 text-amber-600 shrink-0" />
+                <div className="space-y-3 animate-in fade-in">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5">
+                    <MessageSquareWarning className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-semibold">Sentimos muito por isso!</p>
-                      <p className="text-[11px] text-amber-800/90">
-                        Queremos ouvir você para corrigir qualquer falha imediatamente.
+                      <h4 className="text-xs font-bold text-amber-900">
+                        Constructive Feedback Shield Activated! 🛡️
+                      </h4>
+                      <p className="text-[11px] text-amber-700 mt-0.5 leading-snug">
+                        Customers rating 1-3 stars never see the Google link. Instead, they share their concern directly with your management team.
                       </p>
                     </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800">
-                      Como podemos melhorar?
-                    </h4>
-                    <p className="text-[11px] text-slate-500">
-                      Conte o que aconteceu para que a nossa equipe possa corrigir e evoluir nosso atendimento.
-                    </p>
                   </div>
 
                   <form
@@ -351,11 +329,11 @@ export default function LandingPage() {
                   >
                     <div>
                       <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        Seu Nome (Opcional)
+                        Customer Name (Optional)
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: João da Silva"
+                        placeholder="e.g., Alex Taylor"
                         value={demoName}
                         onChange={(e) => setDemoName(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500"
@@ -364,27 +342,24 @@ export default function LandingPage() {
 
                     <div>
                       <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        Seu WhatsApp (para retorno e solução)
+                        Phone / WhatsApp (for private resolution)
                       </label>
                       <input
                         type="tel"
-                        placeholder="(11) 99999-9999"
+                        placeholder="+1 (555) 000-0000"
                         value={demoPhone}
                         onChange={(e) => setDemoPhone(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 font-mono"
                       />
-                      <p className="text-[10px] text-slate-400 mt-1">
-                        Opcional: deixe seu número se desejar uma resposta direta da equipe.
-                      </p>
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-medium text-slate-700 mb-1">
-                        O que podemos fazer para melhorar? *
+                        What can we improve? *
                       </label>
                       <textarea
                         rows={2}
-                        placeholder="Conte com detalhes o que aconteceu em seu atendimento..."
+                        placeholder="Explain what went wrong so management can resolve it..."
                         value={demoComment}
                         onChange={(e) => setDemoComment(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-500 resize-none"
@@ -395,7 +370,7 @@ export default function LandingPage() {
                       type="submit"
                       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-all shadow-md cursor-pointer"
                     >
-                      <span>Enviar Mensagem</span>
+                      <span>Send to Management</span>
                       <Send className="w-3.5 h-3.5" />
                     </button>
 
@@ -404,7 +379,7 @@ export default function LandingPage() {
                       onClick={resetDemo}
                       className="w-full text-center text-xs text-blue-600 font-semibold hover:underline pt-1 cursor-pointer"
                     >
-                      ← Voltar e testar outra nota
+                      ← Back to test another rating
                     </button>
                   </form>
                 </div>
@@ -416,17 +391,17 @@ export default function LandingPage() {
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <h4 className="text-base font-bold text-slate-900">
-                    Mensagem recebida com sucesso!
+                    Resolution Alert Triggered!
                   </h4>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Pronto! O relato foi registrado diretamente no canal de atendimento da empresa (sem publicar no Google) e você recebe o alerta no painel e por e-mail para chamá-lo no WhatsApp e reverter a situação!
+                    The complaint is captured directly into your private dashboard (never posted to Google). You receive an instant notification to reach out to the customer and turn the relationship around.
                   </p>
                   <button
                     type="button"
                     onClick={resetDemo}
                     className="mt-2 text-xs text-blue-600 font-bold hover:underline cursor-pointer"
                   >
-                    ← Testar novamente do início
+                    ← Test again from the beginning
                   </button>
                 </div>
               )}
@@ -435,18 +410,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Vitrine da Placa de Balcão QR Code + Disparador de WhatsApp (Foco Conversão Google Ads) */}
+      {/* Counter Placard & QR Code Showcase */}
       <section className="py-20 px-4 sm:px-6 bg-slate-900 border-b border-slate-800/80">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Coluna Esquerda: Mockup Real da Plaquinha / Display de Balcão */}
+            {/* Left Column: Mockup Display */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="w-full max-w-[300px] bg-slate-100 p-3.5 rounded-[32px] shadow-2xl border border-slate-700/60 relative">
                 <div className="bg-white rounded-[24px] p-6 text-center shadow-sm border border-slate-200/80 flex flex-col items-center">
-                  {/* Barra de destaque superior */}
                   <div className="w-14 h-1.5 rounded-full bg-blue-600 mb-3.5" />
 
-                  {/* 5 Estrelas Douradas */}
                   <div className="flex items-center justify-center gap-1 mb-2">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star key={s} className="w-5 h-5 fill-amber-400 text-amber-400" />
@@ -454,45 +427,43 @@ export default function LandingPage() {
                   </div>
 
                   <span className="text-sm font-extrabold text-slate-900 tracking-tight mb-2">
-                    Sua Empresa / Clínica
+                    Smile Dental Care
                   </span>
 
                   <h4 className="text-base font-extrabold text-slate-900 leading-snug mb-1.5">
-                    Sua opinião vale muito para nós!
+                    Your feedback matters to us!
                   </h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed mb-4">
-                    Aponte a câmera do seu celular para o QR Code abaixo e nos avalie em 30 segundos:
+                    Point your camera at the QR Code below to rate your visit in 30 seconds:
                   </p>
 
-                  {/* QR Code Visual Nítido */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 border-2 border-slate-200 mb-4 flex flex-col items-center justify-center">
                     <QrCode className="w-32 h-32 text-slate-900 stroke-[1.5]" />
                   </div>
 
                   <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-bold">
                     <Zap className="w-3 h-3 fill-blue-600 text-blue-600" />
-                    <span>Leva menos de 30 segundos</span>
+                    <span>Takes less than 30 seconds</span>
                   </div>
                 </div>
-                {/* Base do Display */}
                 <div className="w-28 h-2 bg-slate-300 rounded-b-xl mx-auto mt-1.5 opacity-75" />
               </div>
             </div>
 
-            {/* Coluna Direita: Explicação + Benefícios da Placa Inteligente vs Placa Comum */}
+            {/* Right Column: Explanations */}
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-bold uppercase tracking-wider">
                 <QrCode className="w-3.5 h-3.5" />
-                <span>Placa QR Code de Balcão + Link para WhatsApp</span>
+                <span>Smart Counter Placard + Mobile Link</span>
               </div>
 
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white leading-tight">
-                Por que uma placa de QR Code comum pode ser um{" "}
-                <span className="text-amber-400">tiro no pé</span>?
+                Why standard QR code stands are a{" "}
+                <span className="text-amber-400">risky gamble</span>.
               </h2>
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Quando você compra uma placa comum ou manda o link direto do Google, você entrega uma arma na mão do cliente que teve qualquer pequeno imprevisto. Com o <strong>NotaLocal</strong>, você gera sua <strong>Arte de Balcão com QR Code Inteligente</strong> pronta para imprimir em 2 minutos:
+                When you hand a customer an unfiltered Google Review link, any minor frustration can permanently damage your public score. With <strong>NotaLocal</strong>, you generate <strong>Smart QR Counter Displays</strong> ready to print in 2 minutes:
               </p>
 
               <div className="space-y-3.5">
@@ -500,10 +471,10 @@ export default function LandingPage() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-sm font-bold text-white">
-                      Arte Digital da Placa Pronta em Alta Definição (300 DPI)
+                      Print-Ready High Resolution Artwork (300 DPI)
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                      Personalize com o nome e a cor da sua empresa, baixe em PNG ou imprima em 1 clique para colocar em displays de acrílico na recepção, mesas ou caixa.
+                      Customized with your business name and branding colors. Export as PNG or print directly for reception desks and checkout counters.
                     </p>
                   </div>
                 </div>
@@ -512,10 +483,10 @@ export default function LandingPage() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-sm font-bold text-white">
-                      Filtro Automático Embutido no QR Code e no Link
+                      Automated Review Filtering Built In
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                      Quem marca <strong>4 ou 5 estrelas</strong> é levado direto para avaliar você no Google. Quem marca de <strong>1 a 3 estrelas</strong> cai no seu canal interno privado sem prejudicar sua nota pública.
+                      Customers rating <strong>4 or 5 stars</strong> publish on Google. Customers rating <strong>1 to 3 stars</strong> are redirected to your private manager inbox.
                     </p>
                   </div>
                 </div>
@@ -524,10 +495,10 @@ export default function LandingPage() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-sm font-bold text-white">
-                      Disparador de Convites pelo WhatsApp Incluso
+                      Direct WhatsApp & SMS Outreach
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                      O paciente ou cliente já saiu da loja? Envie o convite de avaliação pelo WhatsApp com textos prontos em 1 clique direto pelo nosso painel.
+                      Send personalized review invites directly from the dashboard after a service appointment with 1-click messaging templates.
                     </p>
                   </div>
                 </div>
@@ -540,14 +511,14 @@ export default function LandingPage() {
                     className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 transition-all"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
-                    <span>Gerar Meu QR Code e Placa Grátis (7 Dias)</span>
+                    <span>Generate Free QR Display (7-Day Trial)</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <p className="text-xs text-slate-400 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>
-                    <strong className="text-slate-200">Sem pegadinha:</strong> não pedimos cartão de crédito, CPF ou qualquer dado financeiro para liberar seu teste.
+                    <strong className="text-slate-200">Zero risk:</strong> no credit card or financial info required to begin.
                   </span>
                 </p>
               </div>
@@ -556,15 +527,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Por que isso é vital para o comércio? */}
+      {/* Why Google Reputation Matters */}
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-              A matemática implacável do Google
+              The Math Behind Google Rankings
             </h2>
             <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-xl mx-auto">
-              Empresas locais perdem centenas de milhares de reais em faturamento simplesmente por não controlarem a reputação online.
+              Local service businesses lose thousands in recurring revenue each month simply by ignoring review gating.
             </p>
           </div>
 
@@ -573,9 +544,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center mb-4">
                 <ShieldAlert className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Efeito 10 para 1</h3>
+              <h3 className="text-lg font-bold text-white mb-2">The 10-to-1 Rule</h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Para cada avaliação de 1 estrela que você recebe, são necessárias até <strong>10 avaliações de 5 estrelas</strong> apenas para recuperar a média anterior.
+                For every single 1-star review received, you need up to <strong>10 consecutive 5-star reviews</strong> just to recover your prior average.
               </p>
             </div>
 
@@ -583,9 +554,9 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4">
                 <TrendingUp className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Ranqueamento Local</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Local SEO Dominance</h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                O algoritmo do Google prioriza estabelecimentos com alto volume de avaliações recentes. Quem tem mais reviews aparece no topo das buscas sem pagar anúncios.
+                Google's local search algorithm rewards profiles with recent, high-velocity reviews. More authentic praise pushes you ahead of competitors without paid ads.
               </p>
             </div>
 
@@ -593,75 +564,74 @@ export default function LandingPage() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
                 <HeartHandshake className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Resolução de Crises</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Rapid Service Recovery</h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                92% dos clientes que tiveram um problema voltam a comprar se forem ouvidos e tiverem sua queixa resolvida com rapidez pela equipe da empresa.
+                92% of unhappy customers return to make future purchases when their complaint is heard and handled promptly through private channels.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Seção de Planos (Ancoragem Mensal vs Anual + 7 Dias Grátis) */}
+      {/* Pricing Section */}
       {!(isLoaded && isSignedIn) && (
-        <section id="planos" className="py-20 px-4 sm:px-6 bg-slate-950/80 border-t border-slate-800">
+        <section id="pricing" className="py-20 px-4 sm:px-6 bg-slate-950/80 border-t border-slate-800">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12 space-y-3">
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5" />
-                7 Dias Grátis para Testar • Zero Dados Financeiros na Entrada
+                7-Day Free Trial • No Payment Info Needed Upfront
               </span>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-                Quanto vale impedir 1 crítica injusta no seu Google?
+                Simple, transparent pricing for growing businesses
               </h2>
               <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-                Você pode usar o NotaLocal gratuitamente por <strong>7 dias</strong> para ver o filtro funcionando no seu próprio balcão ou WhatsApp. Depois do teste, escolha o plano ideal:
+                Test NotaLocal free for <strong>7 days</strong> with full feature access. Afterward, pick the plan that suits your team:
               </p>
 
-              {/* Selo Anti-Desconfiança */}
               <div className="max-w-2xl mx-auto pt-2">
                 <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-4 py-2.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs sm:text-sm text-emerald-200">
                   <span className="font-extrabold text-emerald-400 shrink-0">
-                    🔒 Teste 100% Sem Compromisso:
+                    🔒 Zero Commitment:
                   </span>
                   <span>
-                    Não pedimos cartão de crédito nem dados bancários agora. Não existe cobrança automática ao fim dos 7 dias.
+                    No credit card required. No surprise auto-renewals at the end of the trial period.
                   </span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-              {/* Plano Mensal */}
+              {/* Monthly Plan */}
               <div className="bg-slate-900/90 p-7 sm:p-8 rounded-3xl border border-slate-800 flex flex-col justify-between">
                 <div className="space-y-5">
                   <div>
                     <span className="inline-block px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-bold mb-3">
-                      Sem Fidelidade
+                      Flexible Month-to-Month
                     </span>
-                    <h3 className="text-xl font-bold text-white">Plano Mensal</h3>
+                    <h3 className="text-xl font-bold text-white">Starter Plan</h3>
                     <p className="text-xs text-slate-400 mt-1">
-                      Ideal para quem deseja flexibilidade mês a mês sem compromisso anual.
+                      Ideal for single-location shops and independent clinics.
                     </p>
                   </div>
 
                   <div className="py-4 border-y border-slate-800">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl sm:text-4xl font-extrabold text-white">R$ 49,90</span>
-                      <span className="text-xs text-slate-400">/ mês</span>
+                      <span className="text-3xl sm:text-4xl font-extrabold text-white">$29</span>
+                      <span className="text-xs text-slate-400">/ month</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">
-                      Cobrança mensal via Pix ou Cartão • Cancele quando quiser
+                      Billed monthly • Cancel anytime with 1 click
                     </p>
                   </div>
 
                   <ul className="space-y-3">
                     {[
-                      "7 dias de teste grátis sem precisar de cartão de crédito",
-                      "Página exclusiva personalizada com o nome e cores da sua empresa",
-                      "Filtro inteligente (4-5⭐ vão para o Google / 1-3⭐ ficam no Canal Interno)",
-                      "Ouvidoria Privada com alerta por e-mail e roteiros de resposta no WhatsApp",
-                      "Gerador de Arte Digital de Balcão & QR Code prontos para impressão",
+                      "7-day free trial with no card required",
+                      "Custom branded rating landing page (name, cover, logo)",
+                      "Smart review routing (4-5⭐ to Google / 1-3⭐ to internal inbox)",
+                      "Instant email notifications for new negative feedback",
+                      "High-resolution printable QR counter display artwork",
                     ].map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300">
                         <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
@@ -676,53 +646,46 @@ export default function LandingPage() {
                     href="/onboarding"
                     className="w-full py-3.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition-all flex items-center justify-center gap-2"
                   >
-                    <span>Testar 7 Dias Grátis</span>
+                    <span>Start 7-Day Free Trial</span>
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="/checkout?plan=monthly"
-                    className="block text-center text-xs text-slate-400 hover:text-white transition-colors font-medium"
-                  >
-                    Ou assinar o Plano Mensal direto agora →
                   </Link>
                 </div>
               </div>
 
-              {/* Plano Anual (Destaque) */}
+              {/* Annual Plan (Featured) */}
               <div className="relative bg-gradient-to-b from-blue-950/80 via-slate-900 to-slate-900 p-7 sm:p-8 rounded-3xl border-2 border-blue-500 shadow-2xl shadow-blue-600/20 flex flex-col justify-between">
                 <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-[11px] font-extrabold uppercase tracking-wider shadow-lg">
-                  Mais Escolhido • 40% OFF
+                  Most Popular • 40% OFF
                 </div>
 
                 <div className="space-y-5">
                   <div>
                     <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold mb-3">
-                      Blindagem Anual Completa
+                      Complete Annual Protection
                     </span>
-                    <h3 className="text-xl font-bold text-white">Plano Anual</h3>
+                    <h3 className="text-xl font-bold text-white">Annual Pro Plan</h3>
                     <p className="text-xs text-slate-300 mt-1">
-                      Todos os recursos liberados com 40% de economia e 1 ano inteiro sem preocupação com mensalidades.
+                      Everything included with maximum annual savings and priority support.
                     </p>
                   </div>
 
                   <div className="py-4 border-y border-slate-800/80">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-sm font-bold text-blue-300">12x de</span>
-                      <span className="text-4xl sm:text-5xl font-extrabold text-white">R$ 29,90</span>
-                      <span className="text-xs text-slate-400">no cartão</span>
+                      <span className="text-4xl sm:text-5xl font-extrabold text-white">$19</span>
+                      <span className="text-xs text-slate-400">/ month billed annually</span>
                     </div>
                     <p className="text-xs text-emerald-400 font-semibold mt-1.5">
-                      ou <strong>R$ 297,00 à vista no Pix</strong> (equivale a R$ 0,99 por dia)
+                      Save over 40% compared to month-to-month billing
                     </p>
                   </div>
 
                   <ul className="space-y-3">
                     {[
-                      "Todos os recursos do Plano Mensal 100% liberados",
-                      "Economia imediata de 40% (você economiza R$ 240 no ano)",
-                      "12 meses completos de acesso sem se preocupar com faturas mensais",
-                      "Arte Digital de Balcão em alta definição (300 DPI) + QR Code exclusivo",
-                      "Garantia incondicional de 7 dias ou seu dinheiro de volta",
+                      "All features included with unlimited review submissions",
+                      "Priority support with dedicated onboarding assistance",
+                      "Printable counter display artwork with custom branding",
+                      "Staff response templates and resolution follow-up tracking",
+                      "30-day money-back guarantee",
                     ].map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -738,14 +701,8 @@ export default function LandingPage() {
                     className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
-                    <span>Começar 7 Dias Grátis</span>
+                    <span>Start 7-Day Free Trial</span>
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="/checkout?plan=annual"
-                    className="block text-center text-xs text-blue-300 hover:text-white transition-colors font-semibold"
-                  >
-                    Ou garantir 40% OFF no Plano Anual agora →
                   </Link>
                 </div>
               </div>
@@ -754,57 +711,57 @@ export default function LandingPage() {
         </section>
       )}
 
-      {/* CTA Final */}
+      {/* Final CTA */}
       <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-900 to-slate-950 text-center border-t border-slate-800">
         <div className="max-w-2xl mx-auto space-y-6">
           {isLoaded && isSignedIn ? (
             <>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-1">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Sua conta está ativa no NotaLocal</span>
+                <span>Your account is active</span>
               </div>
               <h2 className="text-3xl font-extrabold text-white">
-                Seu estabelecimento já está protegido!
+                Your business is protected!
               </h2>
               <p className="text-sm text-slate-400">
-                Acesse seu painel a qualquer momento para acompanhar as avaliações recebidas, baixar novas plaquinhas de balcão e gerenciar suas métricas.
+                Access your dashboard anytime to monitor review feedback, download placards, and track resolution metrics.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <Link
                   href="/admin"
                   className="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
                 >
-                  <span>Acessar Meu Painel</span>
+                  <span>Go to Dashboard</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="/clinica-sorriso"
+                  href="/smile-dental-care"
                   className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
                 >
-                  Ver Demo ao Vivo
+                  View Live Demo
                 </Link>
               </div>
             </>
           ) : (
             <>
               <h2 className="text-3xl font-extrabold text-white">
-                Pronto para blindar a nota do seu negócio?
+                Ready to protect and elevate your local reputation?
               </h2>
               <p className="text-sm text-slate-400">
-                Teste gratuitamente por 7 dias sem cartão de crédito. Depois, continue por apenas 12x de R$ 29,90 no plano anual (ou R$ 49,90/mês sem fidelidade).
+                Test free for 7 days with zero credit card required. Generate your smart QR counter placard in under 2 minutes.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <Link
                   href="/onboarding"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/25"
                 >
-                  Começar Meus 7 Dias Grátis
+                  Start My Free 7-Day Trial
                 </Link>
                 <Link
-                  href="/clinica-sorriso"
+                  href="/smile-dental-care"
                   className="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all border border-slate-700"
                 >
-                  Ver Demo ao Vivo
+                  View Live Demo
                 </Link>
               </div>
             </>
@@ -815,9 +772,9 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-8 text-center text-xs text-slate-500">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 NotaLocal. Todos os direitos reservados.</p>
+          <p>© 2026 NotaLocal. All rights reserved.</p>
           <p className="text-slate-400">
-            Feito para impulsionar negócios locais em todo o Brasil.
+            Engineered to empower local businesses and healthcare providers worldwide.
           </p>
         </div>
       </footer>

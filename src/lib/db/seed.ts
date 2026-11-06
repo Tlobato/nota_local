@@ -9,70 +9,70 @@ const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql, { schema });
 
 async function seed() {
-  console.log("🌱 Semeando dados iniciais no Neon PostgreSQL...");
+  console.log("🌱 Seeding demo data into Neon PostgreSQL...");
 
-  // Inserir negócio modelo
-  const [sorriso] = await db
+  // Insert demo business
+  const [demoBusiness] = await db
     .insert(schema.businesses)
     .values({
-      name: "Clínica Odontológica Sorriso",
-      slug: "clinica-sorriso",
-      category: "Odontologia & Estética Dental",
+      name: "Smile Dental Care Clinic",
+      slug: "smile-dental-care",
+      category: "Dentistry & Oral Care",
       coverColor: "#0284c7", // Sky 600
       googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4",
-      notificationPhone: "5511999999999",
-      notificationEmail: "contato@clinicasorriso.com.br",
-      welcomeMessage: "Sua opinião é fundamental para nossa equipe! Como foi sua consulta hoje?",
+      notificationPhone: "+15551234567",
+      notificationEmail: "contact@smiledentalcare.com",
+      welcomeMessage: "Your opinion matters to us! How was your appointment today?",
     })
     .onConflictDoNothing()
     .returning();
 
-  const businessId = sorriso?.id;
+  const businessId = demoBusiness?.id;
 
   if (businessId) {
-    // Inserir feedbacks de teste para o dashboard já nascer vivo
+    // Insert initial feedbacks to populate admin dashboard
     await db.insert(schema.feedbacks).values([
       {
         businessId,
         rating: 5,
-        customerName: "Mariana Alcantara",
-        comment: "Atendimento maravilhoso, a Dra. foi super atenciosa com meu implante!",
+        customerName: "Sarah Jenkins",
+        comment: "Outstanding service! The doctor was very gentle during my implant consultation.",
         redirectedToGoogle: true,
         status: "resolved",
       },
       {
         businessId,
         rating: 5,
-        customerName: "Carlos Eduardo Santos",
-        comment: "Excelente estrutura e pontualidade impecável.",
+        customerName: "Michael Chang",
+        comment: "Spotless facilities, friendly reception, and zero wait time.",
         redirectedToGoogle: true,
         status: "resolved",
       },
       {
         businessId,
         rating: 2,
-        customerName: "Renata Vasconcelos",
-        customerPhone: "(15) 99123-4455",
-        comment: "A consulta atrasou 40 minutos e a recepcionista não me avisou nada. Fiquei chateada pois tinha outro compromisso.",
-        redirectedToGoogle: false, // Bloqueado do Google! Retido para o gerente
+        customerName: "Emily Watson",
+        customerPhone: "+15559876543",
+        comment: "Appointment was delayed by 40 minutes with no prior notice at the reception desk.",
+        redirectedToGoogle: false, // Held internally for manager resolution!
         status: "pending",
       },
       {
         businessId,
         rating: 3,
-        customerName: "Fernando Prado",
-        customerPhone: "(15) 99778-9012",
-        comment: "O dentista é bom, mas o estacionamento conveniado estava lotado e tive que parar longe na chuva.",
-        redirectedToGoogle: false, // Bloqueado do Google! Retido para o gerente
+        customerName: "David Miller",
+        customerPhone: "+15553456789",
+        comment: "Treatment was good, but the validated parking lot was full and had to park blocks away in the rain.",
+        redirectedToGoogle: false, // Held internally for manager resolution!
         status: "contacted",
       },
     ]);
   }
 
-  console.log("✅ Seed finalizado com sucesso!");
+  console.log("✅ Seed completed successfully!");
 }
 
 seed().catch((err) => {
-  console.error("❌ Erro ao semear:", err);
+  console.error("❌ Error while seeding:", err);
   process.exit(1);
 });
